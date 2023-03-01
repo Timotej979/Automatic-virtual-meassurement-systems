@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  api:
+    image: "rpi-api:v1"
+    restart: unless-stopped
+
+    command: sh -c "poetry run python /api/rpi_api.py"
+
+    #Debug tty connection
+    #stdin_open: true
+    #tty: true
+
+    build:
+      context: ./api
+
+    depends_on:
+      vpn:
+        condition: service_started
+
+    networks:
+      - api-nginx-net
+
+  #vpn:
+  #  image: 
+  #  restart: unless-stopped
+  #
+  #  command:
+  #
+  #  build: ./wireguard
+
+
+  nginx:
+    image: "rpi-api:nginx"
+    restart: unless-stopped
+
+    command: sh -c "nginx -g 'daemon off;'"
+
+    build: ./nginx
+
+    networks:
+      - api-nginx-net
+      - nginx-wireguard-net
+
+    ports:
+      ${NGINX_OUT_PORT}:8000
+
+    depends_on:
+      api:
+        condition: service_started
+      wireguard:
+        condition: service_started
+
+# Create two bridges for  api -> nginx and nginx -> wireguard connection (isolation)
+networks:
+  api-nginx-net:
+    driver: bridge
+  nginx-wireguard-net:
+    driver: bridge

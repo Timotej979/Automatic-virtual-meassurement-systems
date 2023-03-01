@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  backend-go:
+    image: "webserver:v1"
+    restart: unless-stopped
+
+    command: "go build -o webserver main.go && ./webserver"
+
+    # Debug tty connection
+    #stdin_open: true
+    #tty: true
+
+    build:
+      context: ./backend
+
+    networks:
+      - backend
+
+    environment:
+      - WEBSERVER_PORT=${APP_WEBSERVER_PORT}
+
+  db:
+    image: postgres:15.1
+    restart: unless-stopped
+
+    # Debug tty connection
+    #stdin_open: true
+    #tty: true
+    
+    networks:
+      - backend
+
+    environment:
+      - POSTGRES_PASSWORD=${APP_DB_PASSWORD} 
+      - POSTGRES_USER=${APP_DB_USERNAME}
+      - POSTGRES_DB=${APP_DB_DBNAME} 
+
+    # Comment out ports here if you do not want outside DB access
+    ports:
+      - ${APP_DB_OUT_PORT}:5432
+
+    volumes:
+      - ./db/data:/var/lib/postgresql/data/
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge

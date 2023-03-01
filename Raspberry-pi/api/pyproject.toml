@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "RPI-API"
+version = "1.0"
+description = "REST API for RPI environmental sensors platform"
+authors = ["Timotej979"]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+
+asyncio = "^3.4.3"
+aiohttp = "^3.8.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
