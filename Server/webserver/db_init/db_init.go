@@ -78,3 +78,8 @@ func Init(c *config.Config) *gorm.DB {
 
     return db
 }
+
+////////////////////// DB HANDLER //////////////////////
+type handler struct {
+    DB *gorm.DB
+}

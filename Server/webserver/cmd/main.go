@@ -3,8 +3,7 @@ package main
 import (
     "log"
 
-    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/db_init"
-    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/methods"
+    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/db_init"
 
     "github.com/gofiber/fiber/v2"
 )
