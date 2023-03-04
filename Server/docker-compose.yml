@@ -1,24 +1,31 @@
 version: "3.9"
 
 services:
-  backend-go:
+  webserver:
     image: "webserver:v1"
     restart: unless-stopped
-
-    command: "go build -o webserver main.go && ./webserver"
 
     # Debug tty connection
     #stdin_open: true
     #tty: true
 
     build:
-      context: ./backend
+      context: ./webserver
+
+    depends_on:
+      db:
+        condition: service_healthy
 
     networks:
       - backend
 
     environment:
-      - WEBSERVER_PORT=${APP_WEBSERVER_PORT}
+      - PORT=${APP_WEBSERVER_PORT}
+      - DB_HOST=db
+      - DB_USER=${APP_DB_USERNAME}
+      - DB_PASS=${APP_DB_PASSWORD}
+      - DB_NAME=${APP_DB_DBNAME}
+      - DB_PORT=5432
 
   db:
     image: postgres:15.1
@@ -42,6 +49,12 @@ services:
 
     volumes:
       - ./db/data:/var/lib/postgresql/data/
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APP_DB_USERNAME} -d ${APP_DB_DBNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   backend:
