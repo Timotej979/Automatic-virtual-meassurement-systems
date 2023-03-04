@@ -1,7 +1,7 @@
 package main 
 
 import (
-    "log"
+    //"log"
 
     "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/db_init"
 
