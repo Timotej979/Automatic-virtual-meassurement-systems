@@ -4,8 +4,8 @@ import (
     "fmt"
     "log"
 
-    "backend/config"
-    "backend/models"
+    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/config"
+    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/models"
 
     "gorm.io/driver/postgres"
     "gorm.io/gorm"

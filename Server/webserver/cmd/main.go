@@ -3,9 +3,9 @@ package main
 import (
     "log"
 
-    "github.com/Timotej979/webserver/config"
-    "github.com/Timotej979/webserver/db"
-    "github.com/Timotej979/webserver/methods"
+    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/config"
+    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/db"
+    "github.com/Timotej979/Automatic-virtual-meassurement-systems/Server/webserver/pkg/methods"
 
     "github.com/gofiber/fiber/v2"
 )
