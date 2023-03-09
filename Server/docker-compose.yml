@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  ######################################  
   webserver:
     image: "webserver:v1"
     restart: unless-stopped
@@ -16,19 +17,20 @@ services:
 
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
 
     networks:
-      - backend
+      - webserver-nginx-net
+      - webserver-db-net
 
     environment:
-      - WEB_PORT=${APP_WEBSERVER_PORT}
       - DB_HOST=db
       - DB_USER=${APP_DB_USERNAME}
       - DB_PASS=${APP_DB_PASSWORD}
       - DB_NAME=${APP_DB_DBNAME}
       - DB_PORT=5432
 
+  ######################################
   db:
     image: postgres:15.1
     restart: unless-stopped
@@ -38,7 +40,7 @@ services:
     #tty: true
     
     networks:
-      - backend
+      - webserver-db-net
 
     environment:
       - POSTGRES_PASSWORD=${APP_DB_PASSWORD} 
@@ -58,8 +60,31 @@ services:
       timeout: 5s
       retries: 5
 
+  ######################################
+  nginx-webserver:
+    image: "webserver:nginx"
+    restart: unless-stopped
+
+    command: sh -c "nginx -g 'daemon off;'"
+
+    build: ./nginx
+
+    networks:
+      - webserver-nginx-net
+
+    ports:
+      - ${NGINX_OUT_PORT}:8000
+
+    depends_on:
+      webserver:
+        condition: service_started
+      db:
+        condition: service_healthy
+
+
+##############################
 networks:
-  backend:
+  webserver-db-net:
     driver: bridge
-  frontend:
+  webserver-nginx-net:
     driver: bridge

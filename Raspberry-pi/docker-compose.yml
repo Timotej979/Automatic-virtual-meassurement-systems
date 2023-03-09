@@ -30,7 +30,7 @@ services:
   #  build: ./wireguard
 
 
-  nginx:
+  nginx-api:
     image: "rpi-api:nginx"
     restart: unless-stopped
 
@@ -43,7 +43,7 @@ services:
       - nginx-wireguard-net
 
     ports:
-      ${NGINX_OUT_PORT}:8000
+      - ${NGINX_OUT_PORT}:8000
 
     depends_on:
       api:

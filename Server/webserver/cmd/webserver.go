@@ -48,7 +48,6 @@ type RelayState struct {
 
 ////////////////////// DB CONFIG //////////////////////
 type Config struct {
-    Port   string `mapstructure:"WEB_PORT"`
     DBHost string `mapstructure:"DB_HOST"`
     DBUser string `mapstructure:"DB_USER"`
     DBPass string `mapstructure:"DB_PASS"`
@@ -58,7 +57,6 @@ type Config struct {
 
 func LoadConfig() (conf Config, err error) {
     // Get environment variables from Config struct using os.Getenv()
-    conf.Port = os.Getenv("WEB_PORT")
     conf.DBHost = os.Getenv("DB_HOST")
     conf.DBUser = os.Getenv("DB_USER")
     conf.DBPass = os.Getenv("DB_PASS")
@@ -66,7 +64,7 @@ func LoadConfig() (conf Config, err error) {
     conf.DBPort = os.Getenv("DB_PORT")
 
     // Check if environment variables are set
-    if conf.Port == "" || conf.DBHost == "" || conf.DBUser == "" || conf.DBPass == "" || conf.DBName == "" || conf.DBPort == "" {
+    if conf.DBHost == "" || conf.DBUser == "" || conf.DBPass == "" || conf.DBName == "" || conf.DBPort == "" {
         // Genarate an error if environment variables are not set
         log.Fatalln("## Environment variables are not set ##")
         return
@@ -115,28 +113,39 @@ func DBInit(conf *Config) int {
     return 0
 }
 
-func healthzRouteHandler (c *fiber.Ctx) error {
-    // return a healthz webpage
+func healthzRouteHandler(c *fiber.Ctx) error {
+    return c.SendString("## WEBSERVER: Healthz request successfull ##")
 }
+
+
+
 
 
 
 ////////////////////// FIBER WEBSERVER //////////////////////
 func fiber_webserver() {
-
     // Start webserver app
     app := fiber.New(fiber.Config{
         AppName: "RPI-Webserver:v1",
-        Concurrency: 256*1024,
         JSONEncoder: json.Marshal,
         JSONDecoder: json.Unmarshal,
-        RequestMethods: "GET",
+        RequestMethods: []string{"GET", "POST", "HEAD"},
+        ServerHeader: "RPI-Webserver",
+
     })
 
-    app.Get("/healthz", healthzRouteHandler)
+    // Start webserver routes
+    webserver := app.Group("/rpi-webserver/v1/")
 
+    // Healthz route
+    webserver.Get("/healthz", healthzRouteHandler)
     
-    err := app.Listen(conf.Port)
+    //TODO: Add more routes
+
+
+
+    // Start webserver
+    err := app.Listen(":5001")
     if err != nil {
         log.Fatalln("## Failed at listening to app ##", err)
     } else {
