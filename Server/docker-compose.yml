@@ -5,6 +5,8 @@ services:
     image: "webserver:v1"
     restart: unless-stopped
 
+    command: sh -c "./bin/server"
+
     # Debug tty connection
     #stdin_open: true
     #tty: true
@@ -14,13 +16,13 @@ services:
 
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
 
     networks:
       - backend
 
     environment:
-      - PORT=${APP_WEBSERVER_PORT}
+      - WEB_PORT=${APP_WEBSERVER_PORT}
       - DB_HOST=db
       - DB_USER=${APP_DB_USERNAME}
       - DB_PASS=${APP_DB_PASSWORD}

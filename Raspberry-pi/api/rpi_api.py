@@ -26,64 +26,95 @@ class RPI_API():
         log.info("## RPI API health check ##")
         return web.Response(text="## API test successfull ##\n")
 
-    # GET one temperature reading
-    @routes.get('/singleTemperatureReading')
+    # GET one air temperature reading
+    @routes.get('/singleAirTemperatureHumidityReading')
     async def single_temperature_reading(request):
-        log.info("## GET single temperature reading ##")
+        log.info("## GET single air temperature/humidity reading ##")
 
         try:
             json_response = RPI_dal.get_temperature()
             return web.json_response({"status": 200, "Data": json_response})
         except:
-            log.exception("!! GET single temperature reading error: Couldn't read the temperature !!")
-            raise web.HTTPInternalServerError("!! GET single temperature reading error: Couldn't read the temperature !!")
+            log.exception("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
+            raise web.HTTPInternalServerError("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
 
-    # GET N temperature readings
-    @routes.get('/bulkTemperatureReading')
+    # GET N air temperature readings
+    @routes.get('/bulkAirTemperatureHumidityReading')
     async def bulk_temperature_reading(request):
-        log.info("## GET bulk temperature reading ##")
+        log.info("## GET bulk air temperature/humidity reading ##")
 
         try:
             numOfReadingsJSON = await request.json()
         except:
-            log.exception("!! GET bulk temperature reading error: Couldn't fetch request JSON !!")
-            raise web.HTTPBadRequest("!! GET bulk temperature reading error: Couldn't fetch request JSON !!")
+            log.exception("!! GET bulk air temperature/humidity reading error: Couldn't fetch request JSON !!")
+            raise web.HTTPBadRequest("!! GET bulk air temperature/humidity reading error: Couldn't fetch request JSON !!")
         else:
             try:
                 json_response = RPI_dal.get_temperature_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data": json_response})
             except:
-                log.exception("!! GET bulk temperature reading error: Couldn't read the temperature !!")
-                raise web.HTTPInternalServerError("!! GET bulk temperature reading error: Couldn't read the temperature !!")
+                log.exception("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
+                raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
 
-    # GET one humidity reading
-    @routes.get('/singleHumidityReading')
+    # GET one air humidity reading
+    @routes.get('/singleAirHumidityReading')
     async def single_humidity_reading(request):
-        log.info("## GET single humidity reading ##")
+        log.info("## GET single air humidity reading ##")
 
         try:
             json_response  = RPI_dal.get_humidity()
             return web.json_resonse({"status": 200, "Data": json_response})
         except:
-            log.exception("!! GET single humidity reading error: Couldn't read the humidity !!")
-            raise web.HTTPInternalServerError("!! GET single humidity reading error: Couldn't read the humidity !!")
+            log.exception("!! GET single air humidity reading error: Couldn't read the humidity !!")
+            raise web.HTTPInternalServerError("!! GET single air humidity reading error: Couldn't read the humidity !!")
 
-    @routes.get('/bulkHumidityReading')
+    # GET N air humidity readings
+    @routes.get('/bulkAirHumidityReading')
     async def bulk_humidity_reading(request):
-        log.info("## GET bulk humidity reading ##")
+        log.info("## GET bulk air humidity reading ##")
 
         try:
             numOfReadingsJSON = await request.json()
         except:
-            log.exception("!! GET bulk humidity reading error: Couldn't fetch request JSON !!")
-            raise web.HTTPBadRequest("!! GET bulk humidity reading error: Couldn't fetch request JSON !!")
+            log.exception("!! GET bulk air humidity reading error: Couldn't fetch request JSON !!")
+            raise web.HTTPBadRequest("!! GET bulk air humidity reading error: Couldn't fetch request JSON !!")
         else:
             try:
                 json_response = RPI_dal.get_humidity_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data":json_response})
             except:
-                log.exception("!! GET bulk humidity reading error: Couldn't get the humidity !!")
-                raise web.HTTPInternalServerError("!! GET bulk humidity reading error: Couldn't get the humidity !!")
+                log.exception("!! GET bulk air humidity reading error: Couldn't get the humidity !!")
+                raise web.HTTPInternalServerError("!! GET bulk air humidity reading error: Couldn't get the humidity !!")
+
+    # GET one soil moisture reading
+    @routes.get('/singleSoilMoistureReading')
+    async def single_soil_moisture_reading(request):
+        log.info("## GET single soil moisture reading ##")
+
+        try:
+            json_response = RPI_dal.get_soil_moisture()
+            return web.json_response({"status": 200, "Data": json_response})
+        except:
+            log.exception("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
+            raise web.HTTPInternalServerError("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
+
+    # GET N soil moisture readings
+    @routes.get('/bulkSoilMoistureReading')
+    async def bulk_soil_moisture_reading(request):
+        log.info("## GET bulk soil moisture reading ##")
+
+        try:
+            numOfReadingsJSON = await request.json()
+        except:
+            log.exception("!! GET bulk soil moisture reading error: Couldn't fetch request JSON !!")
+            raise web.HTTPBadRequest("!! GET bulk soil moisture reading error: Couldn't fetch request JSON !!")
+        else:
+            try:
+                json_response = RPI_dal.get_soil_moisture_bulk(numOfReadingsJSON)
+                return web.json_response({"status": 200, "Data": json_response})
+            except:
+                log.exception("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
+                raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
 
     @routes.get('/relayState')
     async def get_relay_state(request):
