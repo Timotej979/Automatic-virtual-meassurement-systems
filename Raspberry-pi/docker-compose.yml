@@ -14,10 +14,6 @@ services:
     build:
       context: ./api
 
-    depends_on:
-      vpn:
-        condition: service_started
-
     networks:
       - api-nginx-net
 
@@ -43,12 +39,10 @@ services:
       - nginx-wireguard-net
 
     ports:
-      - ${NGINX_OUT_PORT}:8000
+      - 5000:8000
 
     depends_on:
       api:
-        condition: service_started
-      wireguard:
         condition: service_started
 
 # Create two bridges for  api -> nginx and nginx -> wireguard connection (isolation)

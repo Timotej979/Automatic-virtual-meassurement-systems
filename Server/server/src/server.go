@@ -83,7 +83,7 @@ func DBInit(conf *Config) int {
     // Check if db connection worked
     if err != nil {
         log.Fatalln(err)
-        return 0
+        return -1
     } else {
         log.Println("## Connected to database ##")
     }
@@ -94,17 +94,16 @@ func DBInit(conf *Config) int {
     // Check if db.AutoMigrate() worked
     if db.Error != nil {
         log.Fatalln("## Failed at db.AutoMigrate() ##", db.Error)
-        return 0
+        return -1
     } else {
-        log.Println("## db.AutoMigrate() worked ##") 
-        return 1    
+        log.Println("## db.AutoMigrate() worked ##")     
     }
 
     // Close the connection using error check
     dbSQL, err := db.DB()
     if err != nil {
         log.Fatalln("## Failed at closing the connection ##", err)
-        return 0
+        return -1
     } else {
         log.Println("## Closed the connection ##")
     }
@@ -113,17 +112,65 @@ func DBInit(conf *Config) int {
     return 0
 }
 
+////////////////////// DB CONNECTION POOL INIT //////////////////////
+func DBPoolInit(conf *Config) (*sql.DB, int) {
+    // Connect to database
+    url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
+    db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
+
+    // Check if db connection worked
+    if err != nil {
+        log.Fatalln("## Connection to DB failed ##")
+        panic(err.Error())
+    } else {
+        log.Println("## Connected to database ##")
+    }
+
+    // Open the SQL connection
+    dbSQL, err := db.DB()
+    if err != nil {
+        log.Fatalln("## Creation of dbSQL failed ##")
+        panic(err)
+    } else {
+        log.Println("## Closed the connection ##")
+    }
+
+    // Setup connection pool limits
+    dbSQL.SetMaxIdleConns(10)
+    dbSQL.SetMaxOpenConns(100)
+    dbSQL.SetConnMaxLifetime(time.Hour)
+
+    if err = dbSQL.Ping(); err != nil {
+        log.Fatalln(err)
+        return dbSQL, -1
+    }
+
+    return dbSQL, 0
+}
+
+
+
+////////////////////// FIBER ROUTES //////////////////////
+
+////// Webserver routes ////////
+// Healthz route
 func healthzRouteHandler(c *fiber.Ctx) error {
     return c.SendString("## WEBSERVER: Healthz request successfull ##")
+}
+
+////// API routes ////////
+// Pull PG database route
+func pullDatabaseRouteHandler(c *fiber.Ctx) error {
+    return c.SendString("## API: Pull database file ##")
 }
 
 
 
 
-
-
 ////////////////////// FIBER WEBSERVER //////////////////////
-func fiber_webserver() {
+func fiber_server() {
+
+
     // Start webserver app
     app := fiber.New(fiber.Config{
         AppName: "RPI-Webserver:v1",
@@ -134,14 +181,19 @@ func fiber_webserver() {
 
     })
 
-    // Start webserver routes
-    webserver := app.Group("/rpi-webserver/v1/")
+    // Start webserver and api routes
+    webserver := app.Group("/rpi-server/v1/webserver/")
+    api := app.Group("/rpi-server/v1/api/")
 
+    //////// Webserver routes ////////
     // Healthz route
     webserver.Get("/healthz", healthzRouteHandler)
     
     //TODO: Add more routes
 
+    //////// API routes ////////
+
+    //TODO: Add more routes
 
 
     // Start webserver
@@ -163,11 +215,21 @@ func main() {
         log.Fatalln("Failed at config", err)
     }
 
-    if DBInit(&conf) == 1 {
+    // Initialize DB schema and then close the connection
+    if DBInit(&conf) == 0 {
         log.Println("## DB schema initialized ##")
     } else {
         log.Fatalln("## DB schema failed at initialization ##")
     }
 
-    fiber_webserver()   
+    // Initialize DB Pool and keep the connection open
+    db, status := DBPoolInit(&conf)
+    if status == 0 {
+        log.Println("## DB pool initialized ##")
+    } else {
+        log.Fatalln("## DB pool failed initialization ##")
+    }
+
+    // Start fiber server
+    fiber_server()   
 }

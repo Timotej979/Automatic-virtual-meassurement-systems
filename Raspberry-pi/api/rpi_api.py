@@ -20,6 +20,10 @@ class RPI_API():
     # Configure routes table
     routes = web.RouteTableDef
 
+    # Define the DAL class to use in routes
+    dataAbstractionLayer = RPI_dal()
+    
+
     # Healthcheck
     @routes.get('/healthz')
     async def health_check(request):
@@ -32,7 +36,7 @@ class RPI_API():
         log.info("## GET single air temperature/humidity reading ##")
 
         try:
-            json_response = RPI_dal.get_temperature()
+            json_response = request.app.RPI_DAL.get_temperature()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -50,7 +54,7 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk air temperature/humidity reading error: Couldn't fetch request JSON !!")
         else:
             try:
-                json_response = RPI_dal.get_temperature_bulk(numOfReadingsJSON)
+                json_response = request.app.RPI_DAL.get_temperature_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data": json_response})
             except:
                 log.exception("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -62,7 +66,7 @@ class RPI_API():
         log.info("## GET single air humidity reading ##")
 
         try:
-            json_response  = RPI_dal.get_humidity()
+            json_response  = request.app.RPI_DAL.get_humidity()
             return web.json_resonse({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single air humidity reading error: Couldn't read the humidity !!")
@@ -80,7 +84,7 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk air humidity reading error: Couldn't fetch request JSON !!")
         else:
             try:
-                json_response = RPI_dal.get_humidity_bulk(numOfReadingsJSON)
+                json_response = request.app.RPI_DAL.get_humidity_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data":json_response})
             except:
                 log.exception("!! GET bulk air humidity reading error: Couldn't get the humidity !!")
@@ -92,7 +96,7 @@ class RPI_API():
         log.info("## GET single soil moisture reading ##")
 
         try:
-            json_response = RPI_dal.get_soil_moisture()
+            json_response = request.app.RPI_DAL.get_soil_moisture()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
@@ -110,7 +114,7 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk soil moisture reading error: Couldn't fetch request JSON !!")
         else:
             try:
-                json_response = RPI_dal.get_soil_moisture_bulk(numOfReadingsJSON)
+                json_response = request.app.RPI_DAL.get_soil_moisture_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data": json_response})
             except:
                 log.exception("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
@@ -121,7 +125,7 @@ class RPI_API():
         log.info("## GET relay state ##")
 
         try:
-            json_response =  RPI_dal.get_relay_state()
+            json_response =  request.app.RPI_DAL.get_relay_state()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET relay state error: Couldn't fetch relay state !!")
@@ -132,7 +136,7 @@ class RPI_API():
         log.info("## POST change relay state ##")
 
         try:
-            json_response = RPI_dal.change_relay_state()
+            json_response = request.app.RPI_DAL.change_relay_state()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! POST change relay state error: Couldn't change relay state !!")
@@ -140,8 +144,8 @@ class RPI_API():
 
     ############################################################################################################################################
     # Initialization for RPI_API app object
-    async def initialize(self):
-        log.inof("## RPI_API initialization started ##")
+    def __init__(self):
+        log.info("## RPI_API initialization started ##")
         self.subapp = web.Application()
 
         log.info("## Adding routes to application object ##")
@@ -149,6 +153,7 @@ class RPI_API():
 
         # Add sub-app to set the correct IP/rpi-api request
         self.app = web.Application()
+        self.app.RPI_DAL = RPI_dal()
         self.app.add_subapp(URL_PREFIX, self.subapp)
 
         log.info("## RPI API initialization complete ##")
@@ -183,7 +188,7 @@ if __name__ == '__main__':
 
     # Create WebServer object and initialize it
     server = RPI_API()
-    loop.run_until_complete(server.initialize())
+    #loop.run_until_complete(server.initialize())
 
     # Start the RPI_API
     server.start_server(host='0.0.0.0', port=5000, loop=loop)

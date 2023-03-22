@@ -2,8 +2,8 @@ version: "3.9"
 
 services:
   ######################################  
-  webserver:
-    image: "webserver:v1"
+  server:
+    image: "server:v1"
     restart: unless-stopped
 
     command: sh -c "./bin/server"
@@ -13,15 +13,15 @@ services:
     #tty: true
 
     build:
-      context: ./webserver
+      context: ./server
 
     depends_on:
       db:
         condition: service_healthy
 
     networks:
-      - webserver-nginx-net
-      - webserver-db-net
+      - server-nginx-net
+      - server-db-net
 
     environment:
       - DB_HOST=db
@@ -40,7 +40,7 @@ services:
     #tty: true
     
     networks:
-      - webserver-db-net
+      - server-db-net
 
     environment:
       - POSTGRES_PASSWORD=${APP_DB_PASSWORD} 
@@ -61,8 +61,8 @@ services:
       retries: 5
 
   ######################################
-  nginx-webserver:
-    image: "webserver:nginx"
+  nginx-server:
+    image: "server:nginx"
     restart: unless-stopped
 
     command: sh -c "nginx -g 'daemon off;'"
@@ -70,13 +70,13 @@ services:
     build: ./nginx
 
     networks:
-      - webserver-nginx-net
+      - server-nginx-net
 
     ports:
       - ${NGINX_OUT_PORT}:8000
 
     depends_on:
-      webserver:
+      server:
         condition: service_started
       db:
         condition: service_healthy
@@ -84,7 +84,7 @@ services:
 
 ##############################
 networks:
-  webserver-db-net:
+  server-db-net:
     driver: bridge
-  webserver-nginx-net:
+  server-nginx-net:
     driver: bridge
