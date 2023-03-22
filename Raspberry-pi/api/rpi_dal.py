@@ -23,23 +23,9 @@ class RPI_dal():
         timestamp = time.time()
         json_response = {"timestamp": timestamp, "temperature": temperature, "humidity": humidity}
         return json_response
-        
-
-    # GET N Temperature meassurements
-    async def get_air_temperature_bulk(json_data):
-        #TODO: Read temperature at certain timestamps N-times
-        
-
-
-        return 200
-
-    # GET one Humidity meassurement
-    async def get_air_humidity():
-        #TODO: Read humidity from sensor and get timestamp
-        return 200
 
     # GET N Humidity meassurements
-    async def get_air_humidity_bulk(json_data):
+    async def get_air_temperature_humidity_bulk(json_data):
         #TODO: Read humidity at certain timestamps N-times
         return 200
 

@@ -18,10 +18,7 @@ class RPI_API():
     """
 
     # Configure routes table
-    routes = web.RouteTableDef
-
-    # Define the DAL class to use in routes
-    dataAbstractionLayer = RPI_dal()
+    routes = web.RouteTableDef()
     
 
     # Healthcheck
@@ -32,11 +29,12 @@ class RPI_API():
 
     # GET one air temperature reading
     @routes.get('/singleAirTemperatureHumidityReading')
-    async def single_temperature_reading(request):
+    async def single_air_temperature_humidity_reading(request):
         log.info("## GET single air temperature/humidity reading ##")
 
         try:
-            json_response = request.app.RPI_DAL.get_temperature()
+            dataAbstractionLayer = RPI_dal()
+            json_response = dataAbstractionLayer.get_air_temperature_humidity()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -44,7 +42,7 @@ class RPI_API():
 
     # GET N air temperature readings
     @routes.get('/bulkAirTemperatureHumidityReading')
-    async def bulk_temperature_reading(request):
+    async def bulk_air_temperature_humidity_reading(request):
         log.info("## GET bulk air temperature/humidity reading ##")
 
         try:
@@ -54,41 +52,12 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk air temperature/humidity reading error: Couldn't fetch request JSON !!")
         else:
             try:
-                json_response = request.app.RPI_DAL.get_temperature_bulk(numOfReadingsJSON)
+                dataAbstractionLayer = RPI_dal()
+                json_response = dataAbstractionLayer.get_air_temperature_humidity_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data": json_response})
             except:
                 log.exception("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
                 raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
-
-    # GET one air humidity reading
-    @routes.get('/singleAirHumidityReading')
-    async def single_humidity_reading(request):
-        log.info("## GET single air humidity reading ##")
-
-        try:
-            json_response  = request.app.RPI_DAL.get_humidity()
-            return web.json_resonse({"status": 200, "Data": json_response})
-        except:
-            log.exception("!! GET single air humidity reading error: Couldn't read the humidity !!")
-            raise web.HTTPInternalServerError("!! GET single air humidity reading error: Couldn't read the humidity !!")
-
-    # GET N air humidity readings
-    @routes.get('/bulkAirHumidityReading')
-    async def bulk_humidity_reading(request):
-        log.info("## GET bulk air humidity reading ##")
-
-        try:
-            numOfReadingsJSON = await request.json()
-        except:
-            log.exception("!! GET bulk air humidity reading error: Couldn't fetch request JSON !!")
-            raise web.HTTPBadRequest("!! GET bulk air humidity reading error: Couldn't fetch request JSON !!")
-        else:
-            try:
-                json_response = request.app.RPI_DAL.get_humidity_bulk(numOfReadingsJSON)
-                return web.json_response({"status": 200, "Data":json_response})
-            except:
-                log.exception("!! GET bulk air humidity reading error: Couldn't get the humidity !!")
-                raise web.HTTPInternalServerError("!! GET bulk air humidity reading error: Couldn't get the humidity !!")
 
     # GET one soil moisture reading
     @routes.get('/singleSoilMoistureReading')
@@ -96,7 +65,8 @@ class RPI_API():
         log.info("## GET single soil moisture reading ##")
 
         try:
-            json_response = request.app.RPI_DAL.get_soil_moisture()
+            dataAbstractionLayer = RPI_dal()
+            json_response = dataAbstractionLayer.get_soil_moisture()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
@@ -114,7 +84,8 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk soil moisture reading error: Couldn't fetch request JSON !!")
         else:
             try:
-                json_response = request.app.RPI_DAL.get_soil_moisture_bulk(numOfReadingsJSON)
+                dataAbstractionLayer = RPI_dal()
+                json_response = dataAbstractionLayer.get_soil_moisture_bulk(numOfReadingsJSON)
                 return web.json_response({"status": 200, "Data": json_response})
             except:
                 log.exception("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
@@ -125,18 +96,20 @@ class RPI_API():
         log.info("## GET relay state ##")
 
         try:
-            json_response =  request.app.RPI_DAL.get_relay_state()
+            dataAbstractionLayer = RPI_dal()
+            json_response =  dataAbstractionLayer.get_relay_state()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET relay state error: Couldn't fetch relay state !!")
             raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
 
-    @routes.post('changeRealyState')
+    @routes.post('/changeRealyState')
     async def change_relay_state(request):
         log.info("## POST change relay state ##")
 
         try:
-            json_response = request.app.RPI_DAL.change_relay_state()
+            dataAbstractionLayer = RPI_dal()
+            json_response = dataAbstractionLayer.change_relay_state()
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! POST change relay state error: Couldn't change relay state !!")
@@ -153,7 +126,6 @@ class RPI_API():
 
         # Add sub-app to set the correct IP/rpi-api request
         self.app = web.Application()
-        self.app.RPI_DAL = RPI_dal()
         self.app.add_subapp(URL_PREFIX, self.subapp)
 
         log.info("## RPI API initialization complete ##")

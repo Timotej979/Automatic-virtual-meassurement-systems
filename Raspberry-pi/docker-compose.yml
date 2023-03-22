@@ -17,6 +17,10 @@ services:
     networks:
       - api-nginx-net
 
+    environment:
+      - APP_CONFIG=${APP_CONFIG}
+      - API_URL_PREFIX=${API_URL_PREFIX}
+
   #vpn:
   #  image: 
   #  restart: unless-stopped

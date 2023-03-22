@@ -1,0 +1,7 @@
+TEST REQUESTS:
+
+    HEALTHCHECK:
+        curl http://127.0.0.1:5000/rpi-api/v1/healthz
+
+    DHT22 READINGS:
+        curl http://127.0.0.1:5000/rpi-api/v1/singleAirTemperatureHumidityReading
