@@ -35,6 +35,8 @@ class RPI_API():
         try:
             dataAbstractionLayer = RPI_dal()
             json_response = dataAbstractionLayer.get_air_temperature_humidity()
+            if json_response == False:
+                raise web.HTTPInternalServerError("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
             return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -52,9 +54,15 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk air temperature/humidity reading error: Couldn't fetch request JSON !!")
         else:
             try:
+                # Create DAL object
                 dataAbstractionLayer = RPI_dal()
                 json_response = dataAbstractionLayer.get_air_temperature_humidity_bulk(numOfReadingsJSON)
-                return web.json_response({"status": 200, "Data": json_response})
+                
+                # Check if DAL returned False
+                if json_response == False:
+                    raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
+                else:
+                    return web.json_response({"status": 200, "Data": json_response})
             except:
                 log.exception("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
                 raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -65,9 +73,15 @@ class RPI_API():
         log.info("## GET single soil moisture reading ##")
 
         try:
+            # Create DAL object
             dataAbstractionLayer = RPI_dal()
             json_response = dataAbstractionLayer.get_soil_moisture()
-            return web.json_response({"status": 200, "Data": json_response})
+            
+            # Check if DAL returned False
+            if json_response == False:
+                raise web.HTTPInternalServerError("!! GET single soil moisture reading error: Couldn't read the soil_moisture !!")
+            else:
+                return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
             raise web.HTTPInternalServerError("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
@@ -84,9 +98,15 @@ class RPI_API():
             raise web.HTTPBadRequest("!! GET bulk soil moisture reading error: Couldn't fetch request JSON !!")
         else:
             try:
+                # Create DAL object
                 dataAbstractionLayer = RPI_dal()
                 json_response = dataAbstractionLayer.get_soil_moisture_bulk(numOfReadingsJSON)
-                return web.json_response({"status": 200, "Data": json_response})
+                
+                # Check if DAl returned False
+                if json_response = False:
+                    raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't read the soil_moisture !!")
+                else:
+                    return web.json_response({"status": 200, "Data": json_response})
             except:
                 log.exception("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
                 raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
@@ -96,9 +116,15 @@ class RPI_API():
         log.info("## GET relay state ##")
 
         try:
+            # Create DAL object
             dataAbstractionLayer = RPI_dal()
             json_response =  dataAbstractionLayer.get_relay_state()
-            return web.json_response({"status": 200, "Data": json_response})
+            
+            # Check if DAL returned False
+            if json_response == False:
+                raise web.HTTPInternalServerError("")
+            else:
+                return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! GET relay state error: Couldn't fetch relay state !!")
             raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
@@ -108,9 +134,15 @@ class RPI_API():
         log.info("## POST change relay state ##")
 
         try:
+            # Create DAL object
             dataAbstractionLayer = RPI_dal()
             json_response = dataAbstractionLayer.change_relay_state()
-            return web.json_response({"status": 200, "Data": json_response})
+            
+            # Check if DAl returned False
+            if json_response == False:
+                raise web.HTTPInternalServerError("")
+            else:
+                return web.json_response({"status": 200, "Data": json_response})
         except:
             log.exception("!! POST change relay state error: Couldn't change relay state !!")
             raise web.HTTPInternalServerError("!! POST change relay state error: Couldn't change relay state !!")
