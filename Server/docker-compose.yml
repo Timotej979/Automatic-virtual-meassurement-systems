@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   ######################################  
-  server:
+  go-server:
     image: "server:v1"
     restart: unless-stopped
 
@@ -76,7 +76,7 @@ services:
       - ${NGINX_OUT_PORT}:8000
 
     depends_on:
-      server:
+      go-server:
         condition: service_started
       db:
         condition: service_healthy

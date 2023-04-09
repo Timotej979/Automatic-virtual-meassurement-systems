@@ -2,7 +2,6 @@ import logging, os, time
 import adafruit_dht as adafruit_dht
 
 
-
 class RPI_dal():
 
     def __init__(self):
