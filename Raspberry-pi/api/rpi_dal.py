@@ -51,6 +51,12 @@ class RPI_dal():
             # Read temperature from sensor and get timestamp
             humidity, temperature = adafruit_dht.read_retry(self.DHT_SENSOR, getattr(board, self.DHT_PIN))
             timestamp = time.time()
+
+            # Log timestamp and temperature, humidity
+            self.logger.info("## Timestamp: " + str(timestamp) + " ##")
+            self.logger.info("## Air temperature: " + str(temperature) + " ##")
+            self.logger.info("## Air humidity: " + str(humidity) + " ##")
+
             json_response = {"timestamp": timestamp, "air-temperature": temperature, "air-humidity": humidity}
             return json_response
         
@@ -72,7 +78,7 @@ class RPI_dal():
                 # Log start of readings
                 self.logger.info("## GET bulk air temperature/humidity reading started ##")
                 # Log number of readings
-                self.logger.info("Number of readings: " + str(numOfReadings))
+                self.logger.info("## Number of readings: " + str(numOfReadings))
 
                 # Initialize lists
                 timestamp_list = []
@@ -85,6 +91,11 @@ class RPI_dal():
                     humidity, temperature = adafruit_dht.read_retry(self.DHT_SENSOR, getattr(board, self.DHT_PIN))
                     timestamp = time.time()
                 
+                    # Log timestamp and temperature, humidity
+                    self.logger.info("## Timestamp: " + str(timestamp) + " ##")
+                    self.logger.info("## Air temperature: " + str(temperature) + " ##")
+                    self.logger.info("## Air humidity: " + str(humidity) + " ##")
+
                     # Append to lists
                     timestamp_list.append(timestamp)
                     temperature_list.append(temperature)
@@ -107,6 +118,11 @@ class RPI_dal():
             # Read soil moisture from sensor and get timestamp
             soil_moisture = self.soil_moisture_chan.value
             timestamp = time.time()
+
+            # Log timestamp and soil moisture
+            self.logger.info("## Timestamp: " + str(timestamp) + " ##")
+            self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
+
             json_response = {"timestamp": timestamp, "soil-moisture": soil_moisture}
             return json_response
         
@@ -125,7 +141,7 @@ class RPI_dal():
                 # Log start of readings
                 self.logger.info("## GET bulk soil moisture reading started ##")
                 # Log number of readings
-                self.logger.info("Number of readings: " + str(numOfReadings))
+                self.logger.info("## Number of readings: " + str(numOfReadings))
 
                 # Initialize lists
                 timestamp_list = []
@@ -136,6 +152,10 @@ class RPI_dal():
                     # Read soil moisture from sensor and get timestamp
                     soil_moisture = self.soil_moisture_chan.value
                     timestamp = time.time()
+
+                    # Log timestamp and soil moisture
+                    self.logger.info("## Timestamp: " + str(timestamp) + " ##")
+                    self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
 
                     # Append to lists
                     timestamp_list.append(timestamp)
@@ -157,7 +177,12 @@ class RPI_dal():
 
             # Read relay state
             relay_state = self.relay.value
-            json_response = {"relay-state": relay_state}
+            time = time.time()
+
+            # Log relay state
+            self.logger.info("## Relay state: " + str(relay_state) + " ##")
+
+            json_response = {"timestamp": time, "relay-state": relay_state}
             return json_response
         
         except:
@@ -171,12 +196,19 @@ class RPI_dal():
             # Log start of readings
             self.logger.info("## POST change relay state started ##")
 
+            # Log current relay state
+            self.logger.info("## Current relay state: " + str(self.relay.value) + " ##")
+
             # Change relay state
             self.relay.value = not self.relay.value
 
+            # Log new relay state
+            self.logger.info("## New relay state: " + str(self.relay.value) + " ##")
+
             # Return new relay state
             relay_state = self.relay.value
-            json_response = {"relay-state": relay_state}
+            time = time.time()
+            json_response = {"timestamp": time, "relay-state": relay_state}
             return json_response
         
         except:

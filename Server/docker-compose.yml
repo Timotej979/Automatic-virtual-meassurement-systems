@@ -29,6 +29,7 @@ services:
       - DB_PASS=${APP_DB_PASSWORD}
       - DB_NAME=${APP_DB_DBNAME}
       - DB_PORT=5432
+      - RPI_API_CONNECTION_STRING=${RPI_API_CONNECTION_STRING}
 
   ######################################
   db:

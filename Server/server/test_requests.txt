@@ -1,0 +1,6 @@
+TEST REQUESTS:
+
+    HEALTHCHECK:
+        curl http://127.0.0.1:5001/go-server/v1/api/healthz
+
+    

@@ -38,7 +38,7 @@ type AirHumidity struct {
 	Timestamp time.Time	
 }
 
-type SoilHumidity struct {
+type SoilMoisture struct {
 	ID    int    `gorm:"primaryKey"`
 	Value decimal.Decimal `gorm:"type:decimal(7,6);"`
 	Timestamp time.Time	
@@ -46,7 +46,7 @@ type SoilHumidity struct {
 
 type RelayState struct {
 	ID    int    `gorm:"primaryKey"`
-	Value int
+	Value bool
 	ChangeTimestamp time.Time	
     LookupTimestamp time.Time
 }
@@ -60,7 +60,7 @@ type Config struct {
     DBPass string `mapstructure:"DB_PASS"`
     DBName string `mapstructure:"DB_NAME"`
     DBPort string `mapstructure:"DB_PORT"`
-    RPI_API_CONNECTION_STRING string `mapstructure:"RPI_API_CONNECTION_STRING"`
+    RPIapiConnString string `mapstructure:"RPI_API_CONNECTION_STRING"`
 }
 
 func LoadConfig() (conf Config, err error) {
@@ -70,10 +70,10 @@ func LoadConfig() (conf Config, err error) {
     conf.DBPass = os.Getenv("DB_PASS")
     conf.DBName = os.Getenv("DB_NAME")
     conf.DBPort = os.Getenv("DB_PORT")
-    conf.RPI_API_CONNECTION_STRING = os.Getenv("RPI_API_CONNECTION_STRING")
+    conf.RPIapiConnString = os.Getenv("RPI_API_CONNECTION_STRING")
 
     // Check if environment variables are set
-    if conf.DBHost == "" || conf.DBUser == "" || conf.DBPass == "" || conf.DBName == "" || conf.DBPort == "" || conf.RPI_API_CONNECTION_STRING == "" {
+    if conf.DBHost == "" || conf.DBUser == "" || conf.DBPass == "" || conf.DBName == "" || conf.DBPort == "" || conf.RPIapiConnString == "" {
         // Genarate an error if environment variables are not set
         log.Fatalln("!! Environment variables are not set !!")
         return
@@ -99,7 +99,7 @@ func DBInit(conf *Config) int {
     }
 
     // Migrate the schema and close the connection
-    db.AutoMigrate(AirTemperature{}, AirHumidity{}, SoilHumidity{}, RelayState{})
+    db.AutoMigrate(AirTemperature{}, AirHumidity{}, SoilMoisture{}, RelayState{})
 
     // Check if db.AutoMigrate() worked
     if db.Error != nil {
@@ -129,8 +129,7 @@ func DBInit(conf *Config) int {
 ////////////////////// DB CONNECTION POOL INIT //////////////////////
 func DBPoolInit(conf *Config) (*gorm.DB, error) {
     // Build the data source name (DSN) string
-    url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-        conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
+    url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
     // Open a connection to the database
     db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
@@ -198,23 +197,23 @@ type BulkAirTemperatureHumidityResponse struct {
     TimestampList   []time.Time `json:"timestamp-list"`
 }
 
-type SoilHumidityResponse struct {
-	Humidity float64 `json:"humidity"`
+type SoilMoistureResponse struct {
+	Humidity float64 `json:"soil-moisture"`
     Timestamp time.Time `json:"timestamp"`
 }
 
-type BulkSoilHumidityResponse struct {
-    HumidityList []float64 `json:"humidity-list"`
+type BulkSoilMoistureResponse struct {
+    HumidityList []float64 `json:"soil-moisture-list"`
     TimestampList []time.Time `json:"timestamp-list"`
 }
 
 type RelayStateResponse struct {
-	RelayState bool `json:"state"`
+	RelayState bool `json:"relay-state"`
     Timestamp time.Time `json:"timestamp"`
 }
 
 type ChangeRelayStateRequest struct {
-	RelayState bool `json:"state"`
+	RelayState bool `json:"relay-state"`
     Timestamp time.Time `json:"timestamp"`
 }
 
@@ -255,14 +254,31 @@ func getAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRIN
         }
 
         // Access the values in the struct
-        log.Println("Temperature:", resp.Temperature)
-        log.Println("Humidity:", resp.Humidity)
-        log.Println("Timestamp:", resp.Timestamp)
+        log.Println("## Temperature:", resp.Temperature, " ##")
+        log.Println("## Humidity:", resp.Humidity, " ##")
+        log.Println("## Timestamp:", resp.Timestamp, " ##")
 
-        //TODO: Save the data to the database
-        //TODO: Return the data to the frontend
+        // Save the data to the database
+        err = executeInTransaction(db, func(tx *gorm.DB) error {
+            // Save the data to the database
+            db.Create(&AirTemperature{
+                Value: decimal.NewFromFloat(resp.Temperature),
+                Timestamp: resp.Timestamp,
+            })
 
-        return c.SendString("## API: Get air temperature and humidity succesfull ##")
+            db.Create(&AirHumidity{
+                Value: decimal.NewFromFloat(resp.Humidity),
+                Timestamp: resp.Timestamp,
+            })
+            
+            return nil
+        })
+        if err != nil {
+            log.Fatalf("Transaction failed: %s", err.Error())
+        }
+        
+        // Return the data to the frontend in JSON format
+        return c.JSON(resp)
     }
 }
 
@@ -294,14 +310,33 @@ func getBulkAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_S
         }
 
         // Access the values in the struct
-        log.Println("Temperature-list:", resp.TemperatureList)
-        log.Println("Humidity-list:", resp.HumidityList)
-        log.Println("Timestamp-list:", resp.TimestampList)
+        log.Println("## Temperature-list:", resp.TemperatureList)
+        log.Println("## Humidity-list:", resp.HumidityList)
+        log.Println("## Timestamp-list:", resp.TimestampList)
 
-        //TODO: Save the data to the database
-        //TODO: Return the data to the frontend
-
-        return c.SendString("## API: Get bulk air temperature and humidity succesfull ##")
+        // Save the data to the database
+        err = executeInTransaction(db, func(tx *gorm.DB) error {
+            // Save the data to the database
+            for i := 0; i < len(resp.TemperatureList); i++ {
+                db.Create(&AirTemperature{
+                    Value: decimal.NewFromFloat(resp.TemperatureList[i]),
+                    Timestamp: resp.TimestampList[i],
+                })
+                
+                db.Create(&AirHumidity{
+                    Value: decimal.NewFromFloat(resp.HumidityList[i]),
+                    Timestamp: resp.TimestampList[i],
+                })
+            }
+            
+            return nil
+        })
+        if err != nil {
+            log.Fatalf("## Transaction failed:\n%s", err.Error())
+        }
+        
+        // Return the data to the frontend in JSON format
+        return c.JSON(resp)
     }
 }
 
@@ -326,20 +361,33 @@ func getSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) 
             log.Fatalln(err)
         }
 
-        var resp SoilHumidityResponse
+        var resp SoilMoistureResponse
         if err := json.Unmarshal(body, &resp); err != nil {
             log.Fatalln("!! Unmarshal Go-server API response error !!")
             log.Fatalln(err)
         }
 
         // Access the values in the struct
-        log.Println("Humidity:", resp.Humidity)
-        log.Println("Timestamp:", resp.Timestamp)
+        log.Println("## Humidity: ", resp.Humidity, " ##")
+        log.Println("## Timestamp: ", resp.Timestamp, " ##")
 
-        //TODO: Save the data to the database
-        //TODO: Return the data to the frontend
 
-        return c.SendString("## API: Get soil humidity succesfull ##")
+        // Save data to database in a transaction
+        err = executeInTransaction(db, func(tx *gorm.DB) error {
+            // Save the data to the database
+            db.Create(&SoilMoisture{
+                Value: decimal.NewFromFloat(resp.Humidity),
+                Timestamp: resp.Timestamp,
+            })
+            
+            return nil
+        })
+        if err != nil {
+            log.Fatalf("!! Transaction failed:\n%s", err.Error())
+        }
+
+        // Return the data to the frontend in JSON format
+        return c.JSON(resp)
     }
 }
 
@@ -350,7 +398,7 @@ func getBulkSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING stri
         log.Println("## Get bulk soil humidity ##")
 
         // Make a request to a backend API
-        res, err := http.Get(RPI_API_CONNECTION_STRING + "/bulkSoilHumidityReading")
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/bulkSoilMoistureReading")
         if err != nil {
             log.Fatalln("!! GET Go-server API error !!")
             log.Fatalln(err)
@@ -363,20 +411,34 @@ func getBulkSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING stri
             log.Fatalln(err)
         }
 
-        var resp BulkSoilHumidityResponse
+        var resp BulkSoilMoistureResponse
         if err := json.Unmarshal(body, &resp); err != nil {
             log.Fatalln("!! Unmarshal Go-server API response error !!")
             log.Fatalln(err)
         }
 
         // Access the values in the struct
-        log.Println("Humidity-list:", resp.HumidityList)
-        log.Println("Timestamp-list:", resp.TimestampList)
+        log.Println("## Humidity-list:", resp.HumidityList)
+        log.Println("## Timestamp-list:", resp.TimestampList)
 
-        //TODO: Save the data to the database
-        //TODO: Return the data to the frontend
+        // Save the data to the database
+        err = executeInTransaction(db, func(tx *gorm.DB) error {
+            // Save the data to the database
+            for i := 0; i < len(resp.HumidityList); i++ {
+                db.Create(&SoilMoisture{
+                    Value: decimal.NewFromFloat(resp.HumidityList[i]),
+                    Timestamp: resp.TimestampList[i],
+                })
+            }
 
-        return c.SendString("## API: Get bulk soil humidity succesfull ##")
+            return nil
+        })
+        if err != nil {
+            log.Fatalf("!! Transaction failed:\n%s", err.Error())
+        }
+
+        // Return the data to the frontend in JSON format
+        return c.JSON(resp)
     }
 }
 
@@ -407,11 +469,24 @@ func getRelayStateRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) fu
         }
 
         // Access the values in the struct
-        log.Println("Relay state:", resp.RelayState)
+        log.Println("## Relay state: ", resp.RelayState, " ##")
 
-        //TODO: Return the data to the frontend
+        // Save the data to the database
+        err = executeInTransaction(db, func(tx *gorm.DB) error {
+            // Save the data to the database
+            db.Create(&RelayState{
+                Value: resp.RelayState,
+                LookupTimestamp: resp.Timestamp,
+            })
 
-        return c.SendString("## API: Get relay state succesfull ##")
+            return nil
+        })
+        if err != nil {
+            log.Fatalf("!! Transaction failed:\n%s", err.Error())
+        }
+
+        // Return the data to the frontend in JSON format
+        return c.JSON(resp)
     }
 }
 
@@ -421,10 +496,10 @@ func postChangeRelayStateRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING str
         // Log start of function
         log.Println("## Change relay state ##")
 
-        // Read current relay state
-        res, err := http.Get(RPI_API_CONNECTION_STRING + "/relayState")
+        // Make a request to a backend API
+        res, err := http.Post(RPI_API_CONNECTION_STRING + "/changeRelayState", "application/json", nil)
         if err != nil {
-            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln("!! POST Go-server API error !!")
             log.Fatalln(err)
         }
 
@@ -435,29 +510,31 @@ func postChangeRelayStateRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING str
             log.Fatalln(err)
         }
 
-        var resp RelayStateResponse
+        var resp ChangeRelayStateRequest
         if err := json.Unmarshal(body, &resp); err != nil {
             log.Fatalln("!! Unmarshal Go-server API response error !!")
             log.Fatalln(err)
         }
 
         // Access the values in the struct
-        log.Println("Relay state:", resp.RelayState)
+        log.Println("## Relay state:", resp.RelayState, " ##")
 
-        // Make local variable for new relay state
-        var newRelayState bool
+        // Save the data to the database
+        err = executeInTransaction(db, func(tx *gorm.DB) error {
+            // Save the data to the database
+            db.Create(&RelayState{
+                Value: resp.RelayState,
+                ChangeTimestamp: resp.Timestamp,
+            })
 
-        // Change relay state
-        if resp.RelayState == true {
-            newRelayState = false
-        } else {
-            newRelayState = true
+            return nil
+        })
+        if err != nil {
+            log.Fatalf("!! Transaction failed:\n%s", err.Error())
         }
 
-        // Make a request to a backend API
-        res, err := http.Post(RPI_API_CONNECTION_STRING + "/changeRelayState", "application/json", bytes.NewBuffer([]byte(`{"relayState": newRelayState}`)))
-
-        return c.SendString("## API: Change relay state succesfull ##")
+        // Return the data to the frontend in JSON format
+        return c.JSON(resp)
     }
 }
 
@@ -467,16 +544,16 @@ func postChangeRelayStateRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING str
 func fiber_server(db *gorm.DB, conf *Config) {
     // Start server app
     app := fiber.New(fiber.Config{
-        AppName: "RPI-Server:v1",
+        AppName: "GoServer:v1",
         JSONEncoder: json.Marshal,
         JSONDecoder: json.Unmarshal,
         RequestMethods: []string{"GET", "POST", "HEAD"},
-        ServerHeader: "RPI-Server",
+        ServerHeader: "GoServer",
     })
 
     // Write conf variable RPIapiIP to a local variable
-    RPI_API_CONNECTION_STRING := conf.RPI_API_CONNECTION_STRING
-    log.Println("## RPIapiIP requests will be made to: ", RPIapiIP, " ##")
+    RPI_API_CONNECTION_STRING := conf.RPIapiConnString
+    log.Println("## RPIapiIP requests will be made to: ", RPI_API_CONNECTION_STRING, " ##")
 
     // Start api routes
     api := app.Group("/go-server/v1/api")
