@@ -24,6 +24,7 @@ import (
 )
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// DB MODEL DEFINITIONS //////////////////////
 type AirTemperature struct {
     ID    int    `gorm:"primaryKey"`
@@ -51,6 +52,7 @@ type RelayState struct {
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// DB CONFIG //////////////////////
 type Config struct {
     DBHost string `mapstructure:"DB_HOST"`
@@ -58,7 +60,7 @@ type Config struct {
     DBPass string `mapstructure:"DB_PASS"`
     DBName string `mapstructure:"DB_NAME"`
     DBPort string `mapstructure:"DB_PORT"`
-    RPIapiIP string `mapstructure:"RPI_API_IP"`
+    RPI_API_CONNECTION_STRING string `mapstructure:"RPI_API_CONNECTION_STRING"`
 }
 
 func LoadConfig() (conf Config, err error) {
@@ -68,10 +70,10 @@ func LoadConfig() (conf Config, err error) {
     conf.DBPass = os.Getenv("DB_PASS")
     conf.DBName = os.Getenv("DB_NAME")
     conf.DBPort = os.Getenv("DB_PORT")
-    conf.RPIapiIP = os.Getenv("RPI_API_IP")
+    conf.RPI_API_CONNECTION_STRING = os.Getenv("RPI_API_CONNECTION_STRING")
 
     // Check if environment variables are set
-    if conf.DBHost == "" || conf.DBUser == "" || conf.DBPass == "" || conf.DBName == "" || conf.DBPort == "" || conf.RPIapiIP == "" {
+    if conf.DBHost == "" || conf.DBUser == "" || conf.DBPass == "" || conf.DBName == "" || conf.DBPort == "" || conf.RPI_API_CONNECTION_STRING == "" {
         // Genarate an error if environment variables are not set
         log.Fatalln("!! Environment variables are not set !!")
         return
@@ -81,7 +83,7 @@ func LoadConfig() (conf Config, err error) {
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// DB INIT //////////////////////
 func DBInit(conf *Config) int {
     // Connect to database
@@ -123,7 +125,7 @@ func DBInit(conf *Config) int {
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// DB CONNECTION POOL INIT //////////////////////
 func DBPoolInit(conf *Config) (*gorm.DB, error) {
     // Build the data source name (DSN) string
@@ -182,12 +184,18 @@ func executeInTransaction(db *gorm.DB, f func(tx *gorm.DB) error) error {
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// JSON API RESPONSE STRUCTS //////////////////////
 type AirTemperatureHumidityResponse struct {
-    Temperature float64 `json:"temperature"`
-    Humidity    float64 `json:"humidity"`
+    Temperature float64 `json:"air-temperature"`
+    Humidity    float64 `json:"air-humidity"`
     Timestamp   time.Time `json:"timestamp"`
+}
+
+type BulkAirTemperatureHumidityResponse struct {
+    TemperatureList []float64 `json:"air-temperature-list"`
+    HumidityList    []float64 `json:"air-humidity-list"`
+    TimestampList   []time.Time `json:"timestamp-list"`
 }
 
 type SoilHumidityResponse struct {
@@ -195,20 +203,24 @@ type SoilHumidityResponse struct {
     Timestamp time.Time `json:"timestamp"`
 }
 
+type BulkSoilHumidityResponse struct {
+    HumidityList []float64 `json:"humidity-list"`
+    TimestampList []time.Time `json:"timestamp-list"`
+}
+
 type RelayStateResponse struct {
-	State bool `json:"state"`
+	RelayState bool `json:"state"`
     Timestamp time.Time `json:"timestamp"`
 }
 
 type ChangeRelayStateRequest struct {
-	State bool `json:"state"`
+	RelayState bool `json:"state"`
     Timestamp time.Time `json:"timestamp"`
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// FIBER ROUTES //////////////////////
-
 ////// API routes ////////
 // Health test
 func healthzRouteHandler(c *fiber.Ctx) error {
@@ -216,57 +228,241 @@ func healthzRouteHandler(c *fiber.Ctx) error {
 }
 
 // Get air temperature and humidity
-func getAirTemperatureHumidityRouteHandler(c *fiber.Ctx, db *gorm.DB, RPIapiIP string) error {
-    // Log start of function
-    log.Println("## Get air temperature and humidity ##")
+func getAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.Ctx) error {
+    return func(c *fiber.Ctx) error {
+        // Log start of function
+        log.Println("## Get air temperature and humidity ##")
 
-    // Make a request to a backend API
-    res, err := http.Get("http://" + RPIapiIP + "/rpi-server/v1/api/air-temperature-humidity")
-    if err != nil {
-        log.Fatalln("!! GET RPI-API error !!")
-        log.Fatalln(err)
+        // Make a request to a backend API
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/singleAirTemperatureHumidityReading")
+        if err != nil {
+            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln(err)
+        }
+        defer res.Body.Close()
+
+        // Read the response body
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+            log.Fatalln("!! Read Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        var resp AirTemperatureHumidityResponse
+        if err := json.Unmarshal(body, &resp); err != nil {
+            log.Fatalln("!! Unmarshal Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        // Access the values in the struct
+        log.Println("Temperature:", resp.Temperature)
+        log.Println("Humidity:", resp.Humidity)
+        log.Println("Timestamp:", resp.Timestamp)
+
+        //TODO: Save the data to the database
+        //TODO: Return the data to the frontend
+
+        return c.SendString("## API: Get air temperature and humidity succesfull ##")
     }
-    defer res.Body.Close()
-
-    // Read the response body
-    body, err := ioutil.ReadAll(res.Body)
-    if err != nil {
-        log.Fatalln("!! Read RPI-API response error !!")
-        log.Fatalln(err)
-    }
-
-
-
-    return c.SendString("## API: Get air temperature and humidity succesfull ##")
 }
 
-// Get soil humidity
-func getSoilHumidityRouteHandler(c *fiber.Ctx, db *gorm.DB, RPIapiIP string) error {
-    // Log start of function
-    log.Println("## Get soil humidity ##")
+// Get bulk air temperature and humidity
+func getBulkAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.Ctx) error {
+    return func(c *fiber.Ctx) error {
+        // Log start of function
+        log.Println("## Get bulk air temperature and humidity ##")
 
-    return c.SendString("## API: Get soil humidity succesfull ##")
+        // Make a request to a backend API
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/bulkAirTemperatureHumidityReading")
+        if err != nil {
+            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln(err)
+        }
+        defer res.Body.Close()
+
+        // Read the response body
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+            log.Fatalln("!! Read Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        var resp BulkAirTemperatureHumidityResponse
+        if err := json.Unmarshal(body, &resp); err != nil {
+            log.Fatalln("!! Unmarshal Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        // Access the values in the struct
+        log.Println("Temperature-list:", resp.TemperatureList)
+        log.Println("Humidity-list:", resp.HumidityList)
+        log.Println("Timestamp-list:", resp.TimestampList)
+
+        //TODO: Save the data to the database
+        //TODO: Return the data to the frontend
+
+        return c.SendString("## API: Get bulk air temperature and humidity succesfull ##")
+    }
+}
+
+// Get soil moisture
+func getSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.Ctx) error {
+    return func(c *fiber.Ctx) error {
+        // Log start of function
+        log.Println("## Get soil humidity ##")
+
+        // Make a request to a backend API
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/singleSoilMoistureReading")
+        if err != nil {
+            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln(err)
+        }
+        defer res.Body.Close()
+
+        // Read the response body
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+            log.Fatalln("!! Read Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        var resp SoilHumidityResponse
+        if err := json.Unmarshal(body, &resp); err != nil {
+            log.Fatalln("!! Unmarshal Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        // Access the values in the struct
+        log.Println("Humidity:", resp.Humidity)
+        log.Println("Timestamp:", resp.Timestamp)
+
+        //TODO: Save the data to the database
+        //TODO: Return the data to the frontend
+
+        return c.SendString("## API: Get soil humidity succesfull ##")
+    }
+}
+
+// Get bulk soil moisture
+func getBulkSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.Ctx) error {
+    return func(c *fiber.Ctx) error {
+        // Log start of function
+        log.Println("## Get bulk soil humidity ##")
+
+        // Make a request to a backend API
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/bulkSoilHumidityReading")
+        if err != nil {
+            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln(err)
+        }
+
+        // Read the response body
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+            log.Fatalln("!! Read Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        var resp BulkSoilHumidityResponse
+        if err := json.Unmarshal(body, &resp); err != nil {
+            log.Fatalln("!! Unmarshal Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        // Access the values in the struct
+        log.Println("Humidity-list:", resp.HumidityList)
+        log.Println("Timestamp-list:", resp.TimestampList)
+
+        //TODO: Save the data to the database
+        //TODO: Return the data to the frontend
+
+        return c.SendString("## API: Get bulk soil humidity succesfull ##")
+    }
 }
 
 // Get relay state
-func getRelayStateRouteHandler(c *fiber.Ctx, db *gorm.DB, RPIapiIP string) error {
-    // Log start of function
-    log.Println("## Get relay state ##")
+func getRelayStateRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.Ctx) error {
+    return func(c *fiber.Ctx) error {
+        // Log start of function
+        log.Println("## Get relay state ##")
 
-    return c.SendString("## API: Get relay state succesfull ##")
+        // Make a request to a backend API
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/relayState")
+        if err != nil {
+            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln(err)
+        }
+
+        // Read the response body
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+            log.Fatalln("!! Read Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        var resp RelayStateResponse
+        if err := json.Unmarshal(body, &resp); err != nil {
+            log.Fatalln("!! Unmarshal Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        // Access the values in the struct
+        log.Println("Relay state:", resp.RelayState)
+
+        //TODO: Return the data to the frontend
+
+        return c.SendString("## API: Get relay state succesfull ##")
+    }
 }
 
 // Change relay state
-func postChangeRelayStateRouteHandler(c *fiber.Ctx, db *gorm.DB, RPIapiIP string) error {
-    // Log start of function
-    log.Println("## Change relay state ##")
+func postChangeRelayStateRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.Ctx) error {
+    return func(c *fiber.Ctx) error {
+        // Log start of function
+        log.Println("## Change relay state ##")
 
-    return c.SendString("## API: Change relay state succesfull ##")
+        // Read current relay state
+        res, err := http.Get(RPI_API_CONNECTION_STRING + "/relayState")
+        if err != nil {
+            log.Fatalln("!! GET Go-server API error !!")
+            log.Fatalln(err)
+        }
+
+        // Read the response body
+        body, err := ioutil.ReadAll(res.Body)
+        if err != nil {
+            log.Fatalln("!! Read Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        var resp RelayStateResponse
+        if err := json.Unmarshal(body, &resp); err != nil {
+            log.Fatalln("!! Unmarshal Go-server API response error !!")
+            log.Fatalln(err)
+        }
+
+        // Access the values in the struct
+        log.Println("Relay state:", resp.RelayState)
+
+        // Make local variable for new relay state
+        var newRelayState bool
+
+        // Change relay state
+        if resp.RelayState == true {
+            newRelayState = false
+        } else {
+            newRelayState = true
+        }
+
+        // Make a request to a backend API
+        res, err := http.Post(RPI_API_CONNECTION_STRING + "/changeRelayState", "application/json", bytes.NewBuffer([]byte(`{"relayState": newRelayState}`)))
+
+        return c.SendString("## API: Change relay state succesfull ##")
+    }
 }
 
 
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// FIBER WEBSERVER //////////////////////
 func fiber_server(db *gorm.DB, conf *Config) {
     // Start server app
@@ -279,7 +475,7 @@ func fiber_server(db *gorm.DB, conf *Config) {
     })
 
     // Write conf variable RPIapiIP to a local variable
-    RPIapiIP := conf.RPIapiIP
+    RPI_API_CONNECTION_STRING := conf.RPI_API_CONNECTION_STRING
     log.Println("## RPIapiIP requests will be made to: ", RPIapiIP, " ##")
 
     // Start api routes
@@ -290,16 +486,22 @@ func fiber_server(db *gorm.DB, conf *Config) {
     api.Get("/healthz", healthzRouteHandler)
 
     // Get air temperature and humidity
-    api.Get("/air-temperature-humidity", getAirTemperatureHumidityRouteHandler)
+    api.Get("/get-air-temperature-humidity", getAirTemperatureHumidityRouteHandler(db, RPI_API_CONNECTION_STRING))
+
+    // Get bulk air temperature and humidity
+    api.Get("/get-bulk-air-temperature-humidity", getBulkAirTemperatureHumidityRouteHandler(db, RPI_API_CONNECTION_STRING))
 
     // Get soil humidity
-    api.Get("/soil-humidity", getSoilHumidityRouteHandler)
+    api.Get("/get-soil-humidity", getSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
+
+    // Get bulk soil humidity
+    api.Get("/get-bulk-soil-humidity", getBulkSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
 
     // Get relay state
-    api.Get("/relay-state", getRelayStateRouteHandler)
+    api.Get("/relay-state", getRelayStateRouteHandler(db, RPI_API_CONNECTION_STRING))
 
     // Post change relay state
-    api.Post("/change-relay-state", postChangeRelayStateRouteHandler)
+    api.Post("/change-relay-state", postChangeRelayStateRouteHandler(db, RPI_API_CONNECTION_STRING))
 
     //////// Start API server ////////
     err := app.Listen(":5001")
@@ -311,6 +513,7 @@ func fiber_server(db *gorm.DB, conf *Config) {
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// MAIN APP //////////////////////
 func main() {
     // Get config and error check it

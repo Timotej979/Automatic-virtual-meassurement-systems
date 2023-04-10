@@ -103,7 +103,7 @@ class RPI_API():
                 json_response = dataAbstractionLayer.get_soil_moisture_bulk(numOfReadingsJSON)
                 
                 # Check if DAl returned False
-                if json_response = False:
+                if json_response == False:
                     raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't read the soil_moisture !!")
                 else:
                     return web.json_response({"status": 200, "Data": json_response})
@@ -122,7 +122,7 @@ class RPI_API():
             
             # Check if DAL returned False
             if json_response == False:
-                raise web.HTTPInternalServerError("")
+                raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
             else:
                 return web.json_response({"status": 200, "Data": json_response})
         except:
@@ -140,7 +140,7 @@ class RPI_API():
             
             # Check if DAl returned False
             if json_response == False:
-                raise web.HTTPInternalServerError("")
+                raise web.HTTPInternalServerError("!! POST change relay state error: Couldn't change relay state !!")
             else:
                 return web.json_response({"status": 200, "Data": json_response})
         except:
