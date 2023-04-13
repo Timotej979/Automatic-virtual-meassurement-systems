@@ -556,7 +556,7 @@ func fiber_server(db *gorm.DB, conf *Config) {
     log.Println("## RPIapiIP requests will be made to: ", RPI_API_CONNECTION_STRING, " ##")
 
     // Start api routes
-    api := app.Group("/go-server/v1/api")
+    api := app.Group("/goserver/v1/api/")
 
     //////// API routes ////////
     // API health test
@@ -581,7 +581,7 @@ func fiber_server(db *gorm.DB, conf *Config) {
     api.Post("/change-relay-state", postChangeRelayStateRouteHandler(db, RPI_API_CONNECTION_STRING))
 
     //////// Start API server ////////
-    err := app.Listen(":5001")
+    err := app.Listen(":5050")
     if err != nil {
         log.Fatalln("## Failed at listening to app ##", err)
     } else {

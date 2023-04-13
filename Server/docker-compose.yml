@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   ######################################  
-  go-server:
+  goserver:
     image: "server:v1"
     restart: unless-stopped
 
@@ -31,7 +31,7 @@ services:
       - DB_PORT=5432
       - RPI_API_CONNECTION_STRING=${RPI_API_CONNECTION_STRING}
 
-  react-frontend:
+  reactfrontend:
     image: "react-nextjs:v1"
     restart: unless-stopped
 
@@ -45,7 +45,7 @@ services:
       context: ./frontend
 
     depends_on:
-      go-server:
+      goserver:
         condition: service_started
       db:
         condition: service_healthy
@@ -84,7 +84,7 @@ services:
       retries: 5
 
   ######################################
-  nginx-server:
+  nginx:
     image: "server:nginx"
     restart: unless-stopped
 
@@ -100,11 +100,11 @@ services:
       - ${NGINX_OUT_PORT}:8000
 
     depends_on:
-      go-server:
+      goserver:
         condition: service_started
       db:
         condition: service_healthy
-      react-frontend:
+      reactfrontend:
         condition: service_started
 
 
