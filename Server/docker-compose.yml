@@ -3,7 +3,7 @@ version: "3.9"
 services:
   ######################################  
   goserver:
-    image: "server:v1"
+    image: "go-api:v1"
     restart: unless-stopped
 
     command: sh -c "./bin/server"
@@ -35,7 +35,7 @@ services:
     image: "react-nextjs:v1"
     restart: unless-stopped
 
-    command: sh -c "pm2-runtime npm -- start"
+    command: sh -c "npm start"
 
     # Debug tty connection
     #stdin_open: true
@@ -85,7 +85,7 @@ services:
 
   ######################################
   nginx:
-    image: "server:nginx"
+    image: "nginx"
     restart: unless-stopped
 
     command: sh -c "nginx -g 'daemon off;'"
