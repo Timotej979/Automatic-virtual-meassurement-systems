@@ -1,0 +1,29 @@
+.page_container {
+  height:100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(to bottom, #87ceeb 50%, #32cd32 70%, #8b4513 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+  
+.box_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: gray;
+  border-radius: 0.5rem;
+  border-color: lightgray;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.box_title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+}
