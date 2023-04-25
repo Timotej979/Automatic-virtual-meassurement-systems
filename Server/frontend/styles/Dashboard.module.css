@@ -4,8 +4,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
-  background: linear-gradient(to bottom, #87ceeb 50%, #32cd32 70%, #8b4513 100%);
+  /*background: linear-gradient(to bottom, #87ceeb 50%, #32cd32 70%, #8b4513 90%);*/
+  background-image: linear-gradient(-165deg,#ff0,transparent 30%),
+                    linear-gradient(180deg,#87ceeb 50%,#32cd32 52%,#8b4513 70%);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
   
@@ -13,8 +14,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  padding: 1rem;
+  align-items: left;
+  margin: 10px;
+  padding: 10px;
   background: gray;
   border-radius: 0.5rem;
   border-color: lightgray;
@@ -23,7 +25,28 @@
 
 .box_title {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 900;
   color: #fff;
   margin-bottom: 1rem;
+}
+       
+.btn_grad {
+  background-image: linear-gradient(to right, #87ceeb 0%, rgba(255, 255, 0, 0.575)  51%, #87ceeb  100%);
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;            
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  display: block;
+}
+
+.btn_grad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
 }

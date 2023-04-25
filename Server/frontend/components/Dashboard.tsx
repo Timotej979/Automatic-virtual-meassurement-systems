@@ -25,10 +25,26 @@ const Box: React.FC<BoxProps> = ({ title, children}) => {
   return (
     <div className={styles.box_container}>
       <h2 className={styles.box_title}>{title}</h2>
-      {/* Render child content inside the box container */}
-      <div className={styles.content}>{children}</div>
+      <p>
+        {/* Add your box content here */}
+        {children}
+      </p>
     </div>
   );
 };
 
-export {Dashboard, Box};
+// Button component
+interface ButtonProps {
+  children: ReactNode;
+  onClick: () => void;
+}
+const Button: React.FC<ButtonProps> = ({ children, onClick }) => {
+  return (
+    <button className={styles.btn_grad} onClick={onClick}>
+      {children}
+    </button>
+  );
+};
+
+
+export {Dashboard, Box, Button};
