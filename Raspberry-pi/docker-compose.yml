@@ -20,15 +20,10 @@ services:
     environment:
       - APP_CONFIG=${APP_CONFIG}
       - API_URL_PREFIX=${API_URL_PREFIX}
-
-  #vpn:
-  #  image: 
-  #  restart: unless-stopped
-  #
-  #  command:
-  #
-  #  build: ./wireguard
-
+      - DHT_PIN=${DHT_PIN}
+      - SOIL_MOISTURE_PIN=${SOIL_MOISTURE_PIN}
+      - SOIL_MOISTURE_CS_PIN=${SOIL_MOISTURE_CS_PIN}
+      - RELAY_PIN=${RELAY_PIN}
 
   nginx-api:
     image: "rpi-api:nginx"
@@ -40,7 +35,6 @@ services:
 
     networks:
       - api-nginx-net
-      - nginx-wireguard-net
 
     ports:
       - 5000:8000
@@ -49,9 +43,6 @@ services:
       api:
         condition: service_started
 
-# Create two bridges for  api -> nginx and nginx -> wireguard connection (isolation)
 networks:
   api-nginx-net:
-    driver: bridge
-  nginx-wireguard-net:
     driver: bridge
