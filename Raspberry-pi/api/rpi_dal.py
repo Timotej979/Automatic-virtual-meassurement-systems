@@ -22,6 +22,8 @@ class RPI_dal():
         self.SOIL_MOISTURE_CS_PIN = os.getenv('SOIL_MOISTURE_CS_PIN')
         if not self.SOIL_MOISTURE_PIN:
             self.logger.warning("SOIL_MOISTURE_PIN environment variable not set!")
+        elif not self.SOIL_MOISTURE_CS_PIN:
+            self.logger.warning("SOIL_MOISTURE_CS_PIN environment variable not set!")
         else:
             # Create the SPI bus
             self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
