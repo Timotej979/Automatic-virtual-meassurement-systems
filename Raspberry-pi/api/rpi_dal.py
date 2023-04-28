@@ -59,7 +59,12 @@ class RPI_dal():
             self.logger.info("## Air temperature: " + str(temperature) + " ##")
             self.logger.info("## Air humidity: " + str(humidity) + " ##")
 
+            print(temperature)
+            print(humidity)
+            print(timestamp)
+
             json_response = {"timestamp": timestamp, "air-temperature": temperature, "air-humidity": humidity}
+
             return json_response
         
         except:

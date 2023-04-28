@@ -35,6 +35,9 @@ class RPI_API():
         try:
             dataAbstractionLayer = RPI_dal()
             json_response = dataAbstractionLayer.get_air_temperature_humidity()
+
+            print(json_response)
+
             if json_response == False:
                 raise web.HTTPInternalServerError("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
             return web.json_response({"status": 200, "Data": json_response})
@@ -57,7 +60,7 @@ class RPI_API():
                 # Create DAL object
                 dataAbstractionLayer = RPI_dal()
                 json_response = dataAbstractionLayer.get_air_temperature_humidity_bulk(numOfReadingsJSON)
-                
+
                 # Check if DAL returned False
                 if json_response == False:
                     raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
