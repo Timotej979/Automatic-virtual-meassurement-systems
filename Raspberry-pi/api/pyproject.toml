@@ -5,11 +5,12 @@ description = "REST API for RPI environmental sensors platform"
 authors = ["Timotej979"]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.11"
+python = ">=3.9"
 
 asyncio = "^3.4.3"
 aiohttp = "^3.8.1"
 
+rpi-gpio = "^0.7.1"
 adafruit-blinka = "^6.2.0"
 adafruit-circuitpython-dht = "^3.7.8"
 adafruit-circuitpython-mcp3xxx = "^1.4.14"
