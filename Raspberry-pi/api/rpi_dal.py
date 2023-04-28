@@ -63,7 +63,7 @@ class RPI_dal():
             print(humidity)
             print(timestamp)
 
-            json_response = {"timestamp": timestamp, "air-temperature": temperature, "air-humidity": humidity}
+            json_response = {"status": 200, "timestamp": timestamp, "air-temperature": temperature, "air-humidity": humidity}
 
             return json_response
         
@@ -108,7 +108,7 @@ class RPI_dal():
                     temperature_list.append(temperature)
                     humidity_list.append(humidity)
 
-                json_response = {"timestamp-list": timestamp_list, "air-temperature-list": temperature_list, "air-humidity-list": humidity_list}
+                json_response = {"status": 200, "timestamp-list": timestamp_list, "air-temperature-list": temperature_list, "air-humidity-list": humidity_list}
                 return json_response
             
             except:
@@ -130,7 +130,7 @@ class RPI_dal():
             self.logger.info("## Timestamp: " + str(timestamp) + " ##")
             self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
 
-            json_response = {"timestamp": timestamp, "soil-moisture": soil_moisture}
+            json_response = {"status": 200, "timestamp": timestamp, "soil-moisture": soil_moisture}
             return json_response
         
         except:
@@ -168,7 +168,7 @@ class RPI_dal():
                     timestamp_list.append(timestamp)
                     soil_moisture_list.append(soil_moisture)
 
-                json_response = {"timestamp-list": timestamp_list, "soil-moisture-list": soil_moisture_list}
+                json_response = {"status": 200, "timestamp-list": timestamp_list, "soil-moisture-list": soil_moisture_list}
                 return json_response
 
             except:
@@ -189,7 +189,7 @@ class RPI_dal():
             # Log relay state
             self.logger.info("## Relay state: " + str(relay_state) + " ##")
 
-            json_response = {"timestamp": time, "relay-state": relay_state}
+            json_response = {"status": 200, "timestamp": time, "relay-state": relay_state}
             return json_response
         
         except:
@@ -215,7 +215,7 @@ class RPI_dal():
             # Return new relay state
             relay_state = self.relay.value
             time = time.time()
-            json_response = {"timestamp": time, "relay-state": relay_state}
+            json_response = {"status": 200, "timestamp": time, "relay-state": relay_state}
             return json_response
         
         except:

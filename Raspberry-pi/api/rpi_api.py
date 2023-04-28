@@ -40,7 +40,7 @@ class RPI_API():
 
             if json_response == False:
                 raise web.HTTPInternalServerError("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
-            return web.json_response({"status": 200, "Data": json_response})
+            return web.json_response(json_response)
         except:
             log.exception("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
             raise web.HTTPInternalServerError("!! GET single air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -65,7 +65,7 @@ class RPI_API():
                 if json_response == False:
                     raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
                 else:
-                    return web.json_response({"status": 200, "Data": json_response})
+                    return web.json_response(json_response)
             except:
                 log.exception("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
                 raise web.HTTPInternalServerError("!! GET bulk air temperature/humidity reading error: Couldn't read the temperature !!")
@@ -84,7 +84,7 @@ class RPI_API():
             if json_response == False:
                 raise web.HTTPInternalServerError("!! GET single soil moisture reading error: Couldn't read the soil_moisture !!")
             else:
-                return web.json_response({"status": 200, "Data": json_response})
+                return web.json_response(json_response)
         except:
             log.exception("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
             raise web.HTTPInternalServerError("!! GET single soil moisture reading error: Couldn't read the soil moisture !!")
@@ -109,7 +109,7 @@ class RPI_API():
                 if json_response == False:
                     raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't read the soil_moisture !!")
                 else:
-                    return web.json_response({"status": 200, "Data": json_response})
+                    return web.json_response(json_response)
             except:
                 log.exception("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
                 raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
@@ -127,7 +127,7 @@ class RPI_API():
             if json_response == False:
                 raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
             else:
-                return web.json_response({"status": 200, "Data": json_response})
+                return web.json_response(json_response)
         except:
             log.exception("!! GET relay state error: Couldn't fetch relay state !!")
             raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
@@ -145,7 +145,7 @@ class RPI_API():
             if json_response == False:
                 raise web.HTTPInternalServerError("!! POST change relay state error: Couldn't change relay state !!")
             else:
-                return web.json_response({"status": 200, "Data": json_response})
+                return web.json_response(json_response)
         except:
             log.exception("!! POST change relay state error: Couldn't change relay state !!")
             raise web.HTTPInternalServerError("!! POST change relay state error: Couldn't change relay state !!")
