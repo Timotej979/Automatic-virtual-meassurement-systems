@@ -10,10 +10,6 @@ python = ">=3.9,<3.11"
 asyncio = "^3.4.3"
 aiohttp = "^3.8.1"
 
-circuitpython = "~=7.0.0"
-adafruit-circuitpython-dht = "^3.7.8"
-adafruit-circuitpython-mcp3xxx = "^1.4.14"
-
 [tool.poetry.dev-dependencies]
 
 [build-system]
