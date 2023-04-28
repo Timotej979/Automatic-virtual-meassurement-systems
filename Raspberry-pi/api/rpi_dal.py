@@ -15,7 +15,7 @@ class RPI_dal():
         if not self.DHT_PIN:
             self.logger.warning("DHT_PIN environment variable not set!")
         else:
-            self.DHT_SENSOR = adafruit_dht.DHT22(getattr(board, "D" + self.DHT_PIN))
+            self.DHT_SENSOR = adafruit_dht.DHT22(getattr(board, "D" + str(self.DHT_PIN)))
         
         # Initialize capacitive soil moisture sensor
         self.SOIL_MOISTURE_PIN = os.getenv('SOIL_MOISTURE_PIN')
@@ -28,18 +28,18 @@ class RPI_dal():
             # Create the SPI bus
             self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
             # Create the chip select (CS) pin
-            self.cs = digitalio.DigitalInOut(getattr(board, "D" + self.SOIL_MOISTURE_PIN))
+            self.cs = digitalio.DigitalInOut(getattr(board, "D" + str(self.SOIL_MOISTURE_PIN)))
             # Create the MCP3008 object
             self.mcp = MCP.MCP3008(self.spi, self.cs)
             # Create an analog input channel on pin 0
-            self.soil_moisture_chan = AnalogIn(self.mcp, getattr(MCP, getattr(MCP, "P" + self.SOIL_MOISTURE_CS_PIN)))
+            self.soil_moisture_chan = AnalogIn(self.mcp, getattr(MCP, getattr(MCP, "P" + str(self.SOIL_MOISTURE_CS_PIN))))
 
         # Initialize relay
         self.RELAY_PIN = os.getenv('RELAY_PIN')
         if not self.RELAY_PIN:
             self.logger.warning("RELAY_PIN environment variable not set!")
         else:
-            self.relay = digitalio.DigitalInOut(getattr(board, "D" + self.RELAY_PIN))
+            self.relay = digitalio.DigitalInOut(getattr(board, "D" + str(self.RELAY_PIN)))
             self.relay.direction = digitalio.Direction.OUTPUT
 
         
