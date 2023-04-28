@@ -32,7 +32,7 @@ class RPI_dal():
             # Create the MCP3008 object
             self.mcp = MCP.MCP3008(self.spi, self.cs)
             # Create an analog input channel on pin 0
-            self.soil_moisture_chan = AnalogIn(self.mcp, getattr(MCP, getattr(MCP, "P" + str(self.SOIL_MOISTURE_CS_PIN))))
+            self.soil_moisture_chan = AnalogIn(self.mcp, getattr(MCP, "P" + str(self.SOIL_MOISTURE_CS_PIN)))
 
         # Initialize relay
         self.RELAY_PIN = os.getenv('RELAY_PIN')
