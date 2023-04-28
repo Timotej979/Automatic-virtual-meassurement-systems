@@ -1,17 +1,30 @@
 FROM python:3.10
 
 ###################### Add dependencies for different DB conectors if needed ######################
-RUN apt-get update -y && \ 
-    apt-get upgrade -y && \
-    python -m pip install --upgrade pip && \
-    # Install circuit python libraries
-    apt-get install python3-pip && \
-    pip3 install adafruit-blinka && \
-    pip3 install adafruit-circuitpython-dht && \
-    pip3 install adafruit-circuitpython-mcp3xxx && \
-    # Install poetry libraries
-    apt-get install -y curl && \
-    curl -sSL https://install.python-poetry.org | python3 - --version "$APP_POETRY_VERSION" 
+# RUN apt-get update -y && \ 
+#     apt-get upgrade -y && \
+#     python -m pip install --upgrade pip && \
+#     # Install circuit python libraries
+#     apt-get install python3-pip && \
+#     pip3 install adafruit-blinka && \
+#     pip3 install adafruit-circuitpython-dht && \
+#     pip3 install adafruit-circuitpython-mcp3xxx && \
+#     # Install poetry libraries
+#     apt-get install -y curl && \
+#     curl -sSL https://install.python-poetry.org | python3 - --version "$APP_POETRY_VERSION" 
+
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN python -m pip install --upgrade pip
+
+# Install circuit python libraries
+RUN pip3 install adafruit-blinka
+RUN pip3 install adafruit-circuitpython-dht
+RUN pip3 install adafruit-circuitpython-mcp3xxx
+
+# Install poetry libraries
+RUN apt-get install -y curl
+RUN curl -sSL https://install.python-poetry.org | python3 - --version "$APP_POETRY_VERSION"
 
 ###################### Add local path ###################### 
 ENV PATH=/root/.local/bin:$PATH
