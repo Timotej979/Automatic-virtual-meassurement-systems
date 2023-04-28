@@ -20,7 +20,7 @@ services:
     environment:
       - APP_CONFIG=${APP_CONFIG}
       - API_URL_PREFIX=${API_URL_PREFIX}
-      - DHT_PIN=${DHT_PIN}
+      - DHT_PIN=${DHT22_PIN}
       - SOIL_MOISTURE_PIN=${SOIL_MOISTURE_PIN}
       - SOIL_MOISTURE_CS_PIN=${SOIL_MOISTURE_CS_PIN}
       - RELAY_PIN=${RELAY_PIN}
