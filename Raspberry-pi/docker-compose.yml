@@ -14,6 +14,9 @@ services:
     build:
       context: ./api
 
+    devices:
+      - "/dev/spidev0.0:/dev/spidev0.0"
+
     networks:
       - api-nginx-net
 
