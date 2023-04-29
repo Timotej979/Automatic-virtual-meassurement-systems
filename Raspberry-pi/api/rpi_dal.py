@@ -41,6 +41,8 @@ class RPI_dal():
         else:
             self.relay = digitalio.DigitalInOut(getattr(board, "D" + str(self.RELAY_PIN)))
             self.relay.direction = digitalio.Direction.OUTPUT
+            # Negative logic
+            self.relay.value = True
 
     def remap_range(value, left_min, left_max, right_min, right_max):
         # This remaps a value from original (left) range to new (right) range
@@ -242,18 +244,27 @@ class RPI_dal():
             # Log start of readings
             self.logger.info("## POST change relay state started ##")
 
-            # Log current relay state
-            self.logger.info("## Current relay state: " + str(self.relay.value) + " ##")
-
             # Change relay state
-            self.relay.value = not self.relay.value
+            if self.relay.value:
+                # Log current relay state
+                self.logger.info("## Current relay state: True ##")
 
-            # Log new relay state
-            self.logger.info("## New relay state: " + str(self.relay.value) + " ##")
+                # Change relay state
+                self.relay.value = False
+                timestamp = time.time()
 
-            # Return new relay state
-            relay_state = self.relay.value
-            timestamp = time.time()
+                # Log new relay state
+                self.logger.info("## New relay state: False ##")
+            else:
+                # Log current relay state
+                self.logger.info("## Current relay state: False ##")
+
+                # Change relay state
+                self.relay.value = True
+                timestamp = time.time()
+                
+                # Log new relay state
+                self.logger.info("## New relay state: True ##")
 
             return {"timestamp": timestamp, "relay-state": relay_state}
         
