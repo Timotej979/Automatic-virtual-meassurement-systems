@@ -255,6 +255,8 @@ class RPI_dal():
 
                 # Log new relay state
                 self.logger.info("## New relay state: False ##")
+                return {"timestamp": timestamp, "relay-state": False}
+
             else:
                 # Log current relay state
                 self.logger.info("## Current relay state: False ##")
@@ -265,8 +267,7 @@ class RPI_dal():
                 
                 # Log new relay state
                 self.logger.info("## New relay state: True ##")
-
-            return {"timestamp": timestamp, "relay-state": relay_state}
+                return {"timestamp": timestamp, "relay-state": True}
         
         except:
             self.logger.exception("!! POST change relay state error: Couldn't change relay state !!")
