@@ -44,6 +44,8 @@ class RPI_dal():
             # Negative logic
             self.relay.value = True
 
+        return self
+
     def __exit__(self, exc_type, exc_value, traceback):
         # Log exit
         self.logger.info("RPI_dal exit")
