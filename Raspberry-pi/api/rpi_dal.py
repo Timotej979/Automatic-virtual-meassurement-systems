@@ -10,12 +10,12 @@ class RPI_dal():
         self.logger = logging.getLogger(__name__)
         self.logger.info("RPI_dal init")
 
-        # Initialize DHT sensor
+        # Initialize DHT22 sensor
         self.DHT_PIN = os.getenv('DHT_PIN')
         if not self.DHT_PIN:
             self.logger.warning("DHT_PIN environment variable not set!")
         else:
-            self.DHT_SENSOR = adafruit_dht.DHT22(getattr(board, "D" + str(self.DHT_PIN)))
+            self.DHT_SENSOR = adafruit_dht.DHT22(getattr(board, "D" + str(self.DHT_PIN)), use_pulseio=False)
         
         # Initialize capacitive soil moisture sensor
         self.SOIL_MOISTURE_PIN = os.getenv('SOIL_MOISTURE_PIN')
@@ -50,9 +50,26 @@ class RPI_dal():
             # Log start of readings
             self.logger.info("## GET bulk air temperature/humidity reading started ##")
             
-            # Read temperature from sensor and get timestamp
-            humidity, temperature = adafruit_dht.read_retry(self.DHT_SENSOR, getattr(board, self.DHT_PIN))
-            timestamp = time.time()
+            # Set reading boolean to false
+            reading = False
+            # Read DHT22 sensor until successful
+            while not reading:
+                try:
+                    # Read temperature from sensor and get timestamp
+                    humidity, temperature = adafruit_dht.temperature, adafruit_dht.humidity
+                    timestamp = time.time()
+                    reading = True
+                except RuntimeError as rerror:
+                    # Reading failed, retry
+                    self.logger.warning("!! GET single air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
+                    self.logger.warning("!! GET single air temperature/humidity reading error: Retrying in 1 seconds !!")
+                    time.sleep(2.0)
+                    continue
+                except Exception as error:
+                    # Reading failed, retry
+                    self.logger.exception("!! GET single air temperature/humidity reading error: Fatal read DHT22 temperature/humidity !!")
+                    self.DHT_SENSOR.exit()
+                    return False
 
             # Log timestamp and temperature, humidity
             self.logger.info("## Timestamp: " + str(timestamp) + " ##")
@@ -88,9 +105,26 @@ class RPI_dal():
 
                 # Read temperature N-times
                 for i in range(numOfReadings):
-                    # Read temperature from sensor and get timestamp
-                    humidity, temperature = adafruit_dht.read_retry(self.DHT_SENSOR, getattr(board, self.DHT_PIN))
-                    timestamp = time.time()
+                    # Set reading boolean to false
+                    reading = False
+                    # Read DHT22 sensor until successful
+                    while not reading:
+                        try:
+                            # Read temperature from sensor and get timestamp
+                            humidity, temperature = adafruit_dht.temperature, adafruit_dht.humidity
+                            timestamp = time.time()
+                            reading = True
+                        except RuntimeError as rerror:
+                            # Reading failed, retry
+                            self.logger.warning("!! GET single air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
+                            self.logger.warning("!! GET single air temperature/humidity reading error: Retrying in 1 seconds !!")
+                            time.sleep(2.0)
+                            continue
+                        except Exception as error:
+                            # Reading failed, retry
+                            self.logger.exception("!! GET single air temperature/humidity reading error: Fatal read DHT22 temperature/humidity !!")
+                            self.DHT_SENSOR.exit()
+                            return False
                 
                     # Log timestamp and temperature, humidity
                     self.logger.info("## Timestamp: " + str(timestamp) + " ##")
