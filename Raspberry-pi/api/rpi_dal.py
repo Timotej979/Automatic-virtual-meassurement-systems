@@ -44,7 +44,7 @@ class RPI_dal():
             # Negative logic
             self.relay.value = True
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         # Exit DHT22 sensor, mcp and relay
         try:
             self.DHT_SENSOR.exit()
