@@ -242,56 +242,40 @@ class RPI_dal():
         
 
     # GET relay state
-    async def get_relay_state(self):
+    async def set_relay_state_OFF(self):
         try:
             # Log start of readings
-            self.logger.info("## GET relay state started ##")
+            self.logger.info("## POST set relay state OFF started ##")
 
-            # Read relay state
-            relay_state = self.relay.value
+            # Set relay state to OFF
+            self.relay.value = True
             timestamp = time.time()
 
             # Log relay state
-            self.logger.info("## Relay state: " + str(relay_state) + " ##")
+            self.logger.info("## Relay state: False ##")
 
-            return {"timestamp": timestamp, "relay-state": relay_state}
+            return {"timestamp": timestamp, "relay-state": False}
         
         except:
-            self.logger.exception("!! GET relay state error: Couldn't read relay state !!")
+            self.logger.exception("!! POST set relay state OFF error: Couldn't set relay state !!")
             return False
         
 
     # POST change relay state
-    async def change_relay_state(self):
+    async def set_relay_state_ON(self):
         try:
             # Log start of readings
-            self.logger.info("## POST change relay state started ##")
+            self.logger.info("## POST set relay state ON started ##")
 
-            # Change relay state
-            if self.relay.value == True:
-                # Log current relay state
-                self.logger.info("## Current relay state: True ##")
+            # Set relay state to ON
+            self.relay.value = False
+            timestamp = time.time()
 
-                # Change relay state
-                self.relay.value = False
-                timestamp = time.time()
+            # Log relay state
+            self.logger.info("## Relay state: True ##")
 
-                # Log new relay state
-                self.logger.info("## New relay state: False ##")
-                return {"timestamp": timestamp, "relay-state": False}
-
-            if self.relay.value == False:
-                # Log current relay state
-                self.logger.info("## Current relay state: False ##")
-
-                # Change relay state
-                self.relay.value = True
-                timestamp = time.time()
-                
-                # Log new relay state
-                self.logger.info("## New relay state: True ##")
-                return {"timestamp": timestamp, "relay-state": True}
+            return {"timestamp": timestamp, "relay-state": True}
         
         except:
-            self.logger.exception("!! POST change relay state error: Couldn't change relay state !!")
+            self.logger.exception("!! POST set relay state ON error: Couldn't set relay state !!")
             return False

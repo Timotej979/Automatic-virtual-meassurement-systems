@@ -115,41 +115,41 @@ class RPI_API():
                 log.exception("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
                 raise web.HTTPInternalServerError("!! GET bulk soil moisture reading error: Couldn't get the soil moisture !!")
 
-    @routes.get('/relayState')
-    async def get_relay_state(request):
-        log.info("## GET relay state ##")
+    @routes.post('/setRelayON')
+    async def set_relay_ON(request):
+        log.info("## POST set relay ON ##")
 
         try:
             # Create DAL object using context manager
             with RPI_dal() as dataAbstractionLayer:
-                json_response = await dataAbstractionLayer.get_relay_state()
+                json_response = await dataAbstractionLayer.set_relay_state_ON()
 
             # Check if DAL returned False
             if json_response == False:
-                raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
+                raise web.HTTPInternalServerError("!! POST set relay ON: Couldn't set relay state !!")
             else:
                 return web.json_response({"status": 200, "message": json_response})
         except:
-            log.exception("!! GET relay state error: Couldn't fetch relay state !!")
-            raise web.HTTPInternalServerError("!! GET relay state error: Couldn't fetch relay state !!")
+            log.exception("!! POST set relay ON: Couldn't set relay state !!")
+            raise web.HTTPInternalServerError("!! POST set relay ON: Couldn't set relay state !!")
 
-    @routes.post('/changeRealyState')
-    async def change_relay_state(request):
-        log.info("## POST change relay state ##")
+    @routes.post('/setRelayOFF')
+    async def set_relay_OFF(request):
+        log.info("## POST set relay OFF ##")
 
         try:
             # Create DAL object using context manager
             with RPI_dal() as dataAbstractionLayer:
-                json_response = await dataAbstractionLayer.change_relay_state()
-                
+                json_response = await dataAbstractionLayer.set_relay_state_OFF()
+
             # Check if DAl returned False
             if json_response == False:
-                raise web.HTTPInternalServerError("!! POST change relay state error: Couldn't change relay state !!")
+                raise web.HTTPInternalServerError("!! POST set relay OFF error: Couldn't set relay state !!")
             else:
                 return web.json_response({"status": 200, "message": json_response})
         except:
-            log.exception("!! POST change relay state error: Couldn't change relay state !!")
-            raise web.HTTPInternalServerError("!! POST change relay state error: Couldn't change relay state !!")
+            log.exception("!! POST set relay OFF error: Couldn't set relay state !!")
+            raise web.HTTPInternalServerError("!! POST set relay OFF error: Couldn't set relay state !!")
 
     ############################################################################################################################################
     # Initialization for RPI_API app object
