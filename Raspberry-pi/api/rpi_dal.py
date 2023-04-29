@@ -49,13 +49,23 @@ class RPI_dal():
     def __exit__(self, exc_type, exc_value, traceback):
         # Log exit
         self.logger.info("RPI_dal exit")
-        # Exit DHT22 sensor, mcp and relay
+        # Exit DHT22 sensor
         try:
             self.DHT_SENSOR.exit()
-            self.mcp.deinit()
+        except:
+            self.logger.exception("!! RPI_dal deinit error: Couldn't exit DHT22 sensor !!")
+        # Exit relay
+        try:
             self.relay.deinit()
         except:
-            self.logger.exception("!! RPI_dal deinit error: Couldn't exit DHT22 sensor, mcp and relay !!")
+            self.logger.exception("!! RPI_dal deinit error: Couldn't exit relay !!")
+        # Exit spi
+        try:
+            del self.mcp
+            self.spi.deinit()
+            self.cs.deinit()
+        except:
+            self.logger.exception("!! RPI_dal deinit error: Couldn't exit mcp and spi !!")
 
     def remap_range(value, left_min, left_max, right_min, right_max):
         # This remaps a value from original (left) range to new (right) range
