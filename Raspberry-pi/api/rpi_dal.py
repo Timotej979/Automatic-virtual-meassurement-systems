@@ -67,7 +67,7 @@ class RPI_dal():
         except:
             self.logger.exception("!! RPI_dal deinit error: Couldn't exit mcp and spi !!")
 
-    def remap_range(value, left_min, left_max, right_min, right_max):
+    def remap_range(self, value, left_min, left_max, right_min, right_max):
         # This remaps a value from original (left) range to new (right) range
         # Figure out how 'wide' each range is
         left_span = left_max - left_min
@@ -77,7 +77,7 @@ class RPI_dal():
         # Convert the 0-1 range into a value in the right range.
         return int(right_min + (valueScaled * right_span))
 
-    # GET one Temperature meassurement
+    # GET one temperature/humidity meassurement
     async def get_air_temperature_humidity(self):
         # Read temperature from sensor and get timestamp
         try:
@@ -97,7 +97,7 @@ class RPI_dal():
                     # Reading failed, retry
                     self.logger.warning("!! GET single air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
                     self.logger.warning("!! GET single air temperature/humidity reading error: Retrying in 1 seconds !!")
-                    time.sleep(2.0)
+                    time.sleep(1.0)
                     continue
                 except Exception as error:
                     # Reading failed, retry
@@ -116,8 +116,7 @@ class RPI_dal():
             self.logger.exception("!! GET single air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
             return False
 
-
-    # GET N Humidity meassurements
+    # GET N temperature/humidity meassurements
     async def get_air_temperature_humidity_bulk(self, json_data):
         # Read temperature N-times and get timestamps
         try:
@@ -160,15 +159,15 @@ class RPI_dal():
                             self.DHT_SENSOR.exit()
                             return False
                 
-                    # Log timestamp and temperature, humidity
-                    self.logger.info("## Timestamp: " + str(timestamp) + " ##")
-                    self.logger.info("## Air temperature: " + str(temperature) + " ##")
-                    self.logger.info("## Air humidity: " + str(humidity) + " ##")
-
                     # Append to lists
                     timestamp_list.append(timestamp)
                     temperature_list.append(temperature)
                     humidity_list.append(humidity)
+
+                    # Log timestamp and temperature, humidity
+                    self.logger.info("## Timestamp: " + str(timestamp) + " ##")
+                    self.logger.info("## Air temperature: " + str(temperature) + " ##")
+                    self.logger.info("## Air humidity: " + str(humidity) + " ##")
 
                 return {"timestamp-list": timestamp_list, "air-temperature-list": temperature_list, "air-humidity-list": humidity_list}
             
@@ -176,7 +175,7 @@ class RPI_dal():
                 self.logger.exception("!! GET bulk air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
                 return False
             
-    # GET one soil moisture reading
+    # GET one soil moisture meassurement
     async def get_soil_moisture(self):
         # Read soil moisture from sensor and get timestamp
         try:
@@ -193,13 +192,13 @@ class RPI_dal():
             # Log timestamp and soil moisture
             self.logger.info("## Timestamp: " + str(timestamp) + " ##")
             self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
-
             return {"timestamp": timestamp, "soil-moisture": soil_moisture}
         
         except:
             self.logger.exception("!! GET single soil moisture reading error: Couldn't read soil moisture !!")
             return False
 
+    # GET N soil moisture meassurements
     async def get_soil_moisture_bulk(self, json_data):
         # Read soil moisture at certain timestamps N-times
         try:
@@ -226,13 +225,13 @@ class RPI_dal():
                     # Remap soil moisture value
                     soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
 
-                    # Log timestamp and soil moisture
-                    self.logger.info("## Timestamp: " + str(timestamp) + " ##")
-                    self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
-
                     # Append to lists
                     timestamp_list.append(timestamp)
                     soil_moisture_list.append(soil_moisture)
+
+                    # Log timestamp and soil moisture
+                    self.logger.info("## Timestamp: " + str(timestamp) + " ##")
+                    self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
 
                 return {"timestamp-list": timestamp_list, "soil-moisture-list": soil_moisture_list}
 
@@ -240,7 +239,6 @@ class RPI_dal():
                 self.logger.exception("!! GET bulk soil moisture reading error: Couldn't read soil moisture !!")
                 return False
         
-
     # GET relay state
     async def set_relay_state_OFF(self):
         try:
@@ -253,14 +251,12 @@ class RPI_dal():
 
             # Log relay state
             self.logger.info("## Relay state: False ##")
-
             return {"timestamp": timestamp, "relay-state": False}
         
         except:
             self.logger.exception("!! POST set relay state OFF error: Couldn't set relay state !!")
             return False
         
-
     # POST change relay state
     async def set_relay_state_ON(self):
         try:
@@ -273,9 +269,8 @@ class RPI_dal():
 
             # Log relay state
             self.logger.info("## Relay state: True ##")
-
             return {"timestamp": timestamp, "relay-state": True}
-        
+
         except:
             self.logger.exception("!! POST set relay state ON error: Couldn't set relay state !!")
             return False
