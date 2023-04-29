@@ -59,13 +59,7 @@ class RPI_dal():
             self.logger.info("## Air temperature: " + str(temperature) + " ##")
             self.logger.info("## Air humidity: " + str(humidity) + " ##")
 
-            print(temperature)
-            print(humidity)
-            print(timestamp)
-
-            json_response = {"status": 200, "timestamp": timestamp, "air-temperature": temperature, "air-humidity": humidity}
-
-            return json_response
+            return {"timestamp": timestamp, "air-temperature": temperature, "air-humidity": humidity}
         
         except:
             self.logger.exception("!! GET single air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
@@ -108,8 +102,7 @@ class RPI_dal():
                     temperature_list.append(temperature)
                     humidity_list.append(humidity)
 
-                json_response = {"status": 200, "timestamp-list": timestamp_list, "air-temperature-list": temperature_list, "air-humidity-list": humidity_list}
-                return json_response
+                return {"timestamp-list": timestamp_list, "air-temperature-list": temperature_list, "air-humidity-list": humidity_list}
             
             except:
                 self.logger.exception("!! GET bulk air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
@@ -130,8 +123,7 @@ class RPI_dal():
             self.logger.info("## Timestamp: " + str(timestamp) + " ##")
             self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
 
-            json_response = {"status": 200, "timestamp": timestamp, "soil-moisture": soil_moisture}
-            return json_response
+            return {"timestamp": timestamp, "soil-moisture": soil_moisture}
         
         except:
             self.logger.exception("!! GET single soil moisture reading error: Couldn't read soil moisture !!")
@@ -168,8 +160,7 @@ class RPI_dal():
                     timestamp_list.append(timestamp)
                     soil_moisture_list.append(soil_moisture)
 
-                json_response = {"status": 200, "timestamp-list": timestamp_list, "soil-moisture-list": soil_moisture_list}
-                return json_response
+                return {"timestamp-list": timestamp_list, "soil-moisture-list": soil_moisture_list}
 
             except:
                 self.logger.exception("!! GET bulk soil moisture reading error: Couldn't read soil moisture !!")
@@ -184,13 +175,12 @@ class RPI_dal():
 
             # Read relay state
             relay_state = self.relay.value
-            time = time.time()
+            timestamp = time.time()
 
             # Log relay state
             self.logger.info("## Relay state: " + str(relay_state) + " ##")
 
-            json_response = {"status": 200, "timestamp": time, "relay-state": relay_state}
-            return json_response
+            return {"timestamp": timestamp, "relay-state": relay_state}
         
         except:
             self.logger.exception("!! GET relay state error: Couldn't read relay state !!")
@@ -214,9 +204,9 @@ class RPI_dal():
 
             # Return new relay state
             relay_state = self.relay.value
-            time = time.time()
-            json_response = {"status": 200, "timestamp": time, "relay-state": relay_state}
-            return json_response
+            timestamp = time.time()
+
+            return {"timestamp": timestamp, "relay-state": relay_state}
         
         except:
             self.logger.exception("!! POST change relay state error: Couldn't change relay state !!")
