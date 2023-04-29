@@ -25,29 +25,29 @@ import (
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // //////////////////// DB MODEL DEFINITIONS //////////////////////
+
 type AirTemperature struct {
 	ID        int             `gorm:"primaryKey"`
-	Value     decimal.Decimal `gorm:"type:decimal(7,6);"`
-	Timestamp time.Time
+	Value     decimal.Decimal `gorm:"type:decimal(7,6);column:value"`
+	Timestamp time.Time       `gorm:"column:timestamp"`
 }
 
 type AirHumidity struct {
 	ID        int             `gorm:"primaryKey"`
-	Value     decimal.Decimal `gorm:"type:decimal(7,6);"`
-	Timestamp time.Time
+	Value     decimal.Decimal `gorm:"type:decimal(7,6);column:value"`
+	Timestamp time.Time       `gorm:"column:timestamp"`
 }
 
 type SoilMoisture struct {
 	ID        int             `gorm:"primaryKey"`
-	Value     decimal.Decimal `gorm:"type:decimal(7,6);"`
-	Timestamp time.Time
+	Value     decimal.Decimal `gorm:"type:decimal(7,6);column:value"`
+	Timestamp time.Time       `gorm:"column:timestamp"`
 }
 
 type RelayState struct {
-	ID              int `gorm:"primaryKey"`
-	Value           bool
-	ChangeTimestamp time.Time
-	LookupTimestamp time.Time
+	ID              int       `gorm:"primaryKey"`
+	Value           bool      `gorm:"type:boolean;column:value"`
+	ChangeTimestamp time.Time `gorm:"column:change_timestamp"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,31 +180,62 @@ func executeInTransaction(db *gorm.DB, f func(tx *gorm.DB) error) error {
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // //////////////////// JSON API RESPONSE STRUCTS //////////////////////
+type CustomTime struct {
+	time.Time
+}
+
+func (t *CustomTime) UnmarshalJSON(b []byte) error {
+	layout := "2006-01-02 15:04:05.000" // adjust to your input format
+	s := string(b)
+	s = s[1 : len(s)-1] // remove quotes from the string
+	parsed, err := time.Parse(layout, s)
+	if err != nil {
+		return err
+	}
+	*t = CustomTime{parsed}
+	return nil
+}
+
 type AirTemperatureHumidityResponse struct {
-	Temperature float64   `json:"air-temperature"`
-	Humidity    float64   `json:"air-humidity"`
-	Timestamp   time.Time `json:"timestamp"`
+	Status  int `json:"status"`
+	Message struct {
+		Temperature float64    `json:"air-temperature"`
+		Humidity    float64    `json:"air-humidity"`
+		Timestamp   CustomTime `json:"timestamp"`
+	} `json:"message"`
 }
 
 type BulkAirTemperatureHumidityResponse struct {
-	TemperatureList []float64   `json:"air-temperature-list"`
-	HumidityList    []float64   `json:"air-humidity-list"`
-	TimestampList   []time.Time `json:"timestamp-list"`
+	Status  int `json:"status"`
+	Message struct {
+		TemperatureList []float64    `json:"air-temperature-list"`
+		HumidityList    []float64    `json:"air-humidity-list"`
+		TimestampList   []CustomTime `json:"timestamp-list"`
+	} `json:"message"`
 }
 
 type SoilMoistureResponse struct {
-	Humidity  float64   `json:"soil-moisture"`
-	Timestamp time.Time `json:"timestamp"`
+	Status  int `json:"status"`
+	Message struct {
+		Humidity  float64    `json:"soil-moisture"`
+		Timestamp CustomTime `json:"timestamp"`
+	} `json:"message"`
 }
 
 type BulkSoilMoistureResponse struct {
-	HumidityList  []float64   `json:"soil-moisture-list"`
-	TimestampList []time.Time `json:"timestamp-list"`
+	Status  int `json:"status"`
+	Message struct {
+		HumidityList  []float64    `json:"soil-moisture-list"`
+		TimestampList []CustomTime `json:"timestamp-list"`
+	} `json:"message"`
 }
 
 type RelayStateResponse struct {
-	RelayState bool      `json:"relay-state"`
-	Timestamp  time.Time `json:"timestamp"`
+	Status  int `json:"status"`
+	Message struct {
+		RelayState bool       `json:"relay-state"`
+		Timestamp  CustomTime `json:"timestamp"`
+	} `json:"message"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,34 +263,39 @@ func getAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRIN
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalln("!! Read Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
-		log.Println(body)
+		// Print the response body
+		log.Println("## Go-server API response body: ##")
+		log.Println(string(body))
 
+		// Unmarshal the message response body into a struct
 		var resp AirTemperatureHumidityResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
-			log.Fatalln("!! Unmarshal Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
 		}
 
+		// Print struct
+		log.Println("## Go-server API response struct: ##")
+		log.Println(resp)
+
 		// Access the values in the struct
-		log.Println("## Temperature:", resp.Temperature, " ##")
-		log.Println("## Humidity:", resp.Humidity, " ##")
-		log.Println("## Timestamp:", resp.Timestamp, " ##")
+		log.Println("## Temperature:", resp.Message.Temperature, " ##")
+		log.Println("## Humidity:", resp.Message.Humidity, " ##")
+		log.Println("## Timestamp:", resp.Message.Timestamp, " ##")
 
 		// Save the data to the database
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
 			// Save the data to the database
 			db.Create(&AirTemperature{
-				Value:     decimal.NewFromFloat(resp.Temperature),
-				Timestamp: resp.Timestamp,
+				Value:     decimal.NewFromFloat(resp.Message.Temperature),
+				Timestamp: time.Time(resp.Message.Timestamp.Time),
 			})
 
 			db.Create(&AirHumidity{
-				Value:     decimal.NewFromFloat(resp.Humidity),
-				Timestamp: resp.Timestamp,
+				Value:     decimal.NewFromFloat(resp.Message.Humidity),
+				Timestamp: time.Time(resp.Message.Timestamp.Time),
 			})
 
 			return nil
@@ -290,33 +326,31 @@ func getBulkAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_S
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalln("!! Read Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
 		var resp BulkAirTemperatureHumidityResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
-			log.Fatalln("!! Unmarshal Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
 		}
 
 		// Access the values in the struct
-		log.Println("## Temperature-list:", resp.TemperatureList)
-		log.Println("## Humidity-list:", resp.HumidityList)
-		log.Println("## Timestamp-list:", resp.TimestampList)
+		log.Println("## Temperature-list:", resp.Message.TemperatureList)
+		log.Println("## Humidity-list:", resp.Message.HumidityList)
+		log.Println("## Timestamp-list:", resp.Message.TimestampList)
 
 		// Save the data to the database
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
 			// Save the data to the database
-			for i := 0; i < len(resp.TemperatureList); i++ {
+			for i := 0; i < len(resp.Message.TemperatureList); i++ {
 				db.Create(&AirTemperature{
-					Value:     decimal.NewFromFloat(resp.TemperatureList[i]),
-					Timestamp: resp.TimestampList[i],
+					Value:     decimal.NewFromFloat(resp.Message.TemperatureList[i]),
+					Timestamp: time.Time(resp.Message.TimestampList[i].Time),
 				})
 
 				db.Create(&AirHumidity{
-					Value:     decimal.NewFromFloat(resp.HumidityList[i]),
-					Timestamp: resp.TimestampList[i],
+					Value:     decimal.NewFromFloat(resp.Message.HumidityList[i]),
+					Timestamp: time.Time(resp.Message.TimestampList[i].Time),
 				})
 			}
 
@@ -348,26 +382,24 @@ func getSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING string) 
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalln("!! Read Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
 		var resp SoilMoistureResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
-			log.Fatalln("!! Unmarshal Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
 		}
 
 		// Access the values in the struct
-		log.Println("## Humidity: ", resp.Humidity, " ##")
-		log.Println("## Timestamp: ", resp.Timestamp, " ##")
+		log.Println("## Humidity: ", resp.Message.Humidity, " ##")
+		log.Println("## Timestamp: ", resp.Message.Timestamp, " ##")
 
 		// Save data to database in a transaction
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
 			// Save the data to the database
 			db.Create(&SoilMoisture{
-				Value:     decimal.NewFromFloat(resp.Humidity),
-				Timestamp: resp.Timestamp,
+				Value:     decimal.NewFromFloat(resp.Message.Humidity),
+				Timestamp: time.Time(resp.Message.Timestamp.Time),
 			})
 
 			return nil
@@ -397,27 +429,25 @@ func getBulkSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING stri
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalln("!! Read Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
 		var resp BulkSoilMoistureResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
-			log.Fatalln("!! Unmarshal Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
 		}
 
 		// Access the values in the struct
-		log.Println("## Humidity-list:", resp.HumidityList)
-		log.Println("## Timestamp-list:", resp.TimestampList)
+		log.Println("## Humidity-list:", resp.Message.HumidityList)
+		log.Println("## Timestamp-list:", resp.Message.TimestampList)
 
 		// Save the data to the database
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
 			// Save the data to the database
-			for i := 0; i < len(resp.HumidityList); i++ {
+			for i := 0; i < len(resp.Message.HumidityList); i++ {
 				db.Create(&SoilMoisture{
-					Value:     decimal.NewFromFloat(resp.HumidityList[i]),
-					Timestamp: resp.TimestampList[i],
+					Value:     decimal.NewFromFloat(resp.Message.HumidityList[i]),
+					Timestamp: time.Time(resp.Message.TimestampList[i].Time),
 				})
 			}
 
@@ -448,25 +478,23 @@ func setRelayStateOFF(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalln("!! Read Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
 		var resp RelayStateResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
-			log.Fatalln("!! Unmarshal Go-server API response error !!")
-			log.Fatalln(err)
+			log.Fatalln("!! Unmarshal Go-server API response error !!", err)
 		}
 
 		// Access the values in the struct
-		log.Println("## Relay state: ", resp.RelayState, " ##")
+		log.Println("## Relay state: ", resp.Message.RelayState, " ##")
 
 		// Save the data to the database
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
 			// Save the data to the database
 			db.Create(&RelayState{
-				Value:           resp.RelayState,
-				LookupTimestamp: resp.Timestamp,
+				Value:           resp.Message.RelayState,
+				ChangeTimestamp: time.Time(resp.Message.Timestamp.Time),
 			})
 
 			return nil
@@ -507,14 +535,14 @@ func setRelayStateON(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.
 		}
 
 		// Access the values in the struct
-		log.Println("## Relay state:", resp.RelayState, " ##")
+		log.Println("## Relay state:", resp.Message.RelayState, " ##")
 
 		// Save the data to the database
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
 			// Save the data to the database
 			db.Create(&RelayState{
-				Value:           resp.RelayState,
-				ChangeTimestamp: resp.Timestamp,
+				Value:           resp.Message.RelayState,
+				ChangeTimestamp: time.Time(resp.Message.Timestamp.Time),
 			})
 
 			return nil
@@ -564,10 +592,10 @@ func fiber_server(db *gorm.DB, conf *Config) {
 	api.Get("/get-bulk-soil-moisture", getBulkSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
 
 	// Get relay state
-	api.Get("/relay-state", getRelayStateRouteHandler(db, RPI_API_CONNECTION_STRING))
+	api.Get("/set-relay-state-OFF", setRelayStateOFF(db, RPI_API_CONNECTION_STRING))
 
 	// Post change relay state
-	api.Post("/change-relay-state", postChangeRelayStateRouteHandler(db, RPI_API_CONNECTION_STRING))
+	api.Post("/set-relay-state-ON", setRelayStateON(db, RPI_API_CONNECTION_STRING))
 
 	//////// Start API server ////////
 	err := app.Listen(":5050")

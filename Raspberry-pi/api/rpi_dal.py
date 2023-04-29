@@ -90,7 +90,7 @@ class RPI_dal():
             while not reading:
                 try:
                     # Read temperature from sensor and get timestamp
-                    humidity, temperature = self.DHT_SENSOR.temperature, self.DHT_SENSOR.humidity
+                    humidity, temperature = self.DHT_SENSOR.humidity, self.DHT_SENSOR.temperature
                     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                     reading = True
                 except RuntimeError as rerror:
@@ -144,7 +144,7 @@ class RPI_dal():
                     while not reading:
                         try:
                             # Read temperature from sensor and get timestamp
-                            humidity, temperature = self.DHT_SENSOR.temperature, self.DHT_SENSOR.humidity
+                            humidity, temperature = self.DHT_SENSOR.humidity, self.DHT_SENSOR.temperature
                             timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                             reading = True
                         except RuntimeError as rerror:
