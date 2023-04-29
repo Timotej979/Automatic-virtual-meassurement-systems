@@ -8,7 +8,7 @@ class RPI_dal():
     def __enter__(self):
         # Initialize logger
         self.logger = logging.getLogger(__name__)
-        self.logger.info("RPI_dal init")
+        self.logger.info("RPI_dal enter")
 
         # Initialize DHT22 sensor
         self.DHT_PIN = os.getenv('DHT_PIN')
@@ -45,6 +45,8 @@ class RPI_dal():
             self.relay.value = True
 
     def __exit__(self, exc_type, exc_value, traceback):
+        # Log exit
+        self.logger.info("RPI_dal exit")
         # Exit DHT22 sensor, mcp and relay
         try:
             self.DHT_SENSOR.exit()
