@@ -245,7 +245,7 @@ class RPI_dal():
             self.logger.info("## POST change relay state started ##")
 
             # Change relay state
-            if self.relay.value:
+            if self.relay.value == True:
                 # Log current relay state
                 self.logger.info("## Current relay state: True ##")
 
@@ -257,7 +257,7 @@ class RPI_dal():
                 self.logger.info("## New relay state: False ##")
                 return {"timestamp": timestamp, "relay-state": False}
 
-            else:
+            if self.relay.value == False:
                 # Log current relay state
                 self.logger.info("## Current relay state: False ##")
 
