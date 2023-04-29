@@ -5,7 +5,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 
 class RPI_dal():
 
-    def __init__(self):
+    def __enter__(self):
         # Initialize logger
         self.logger = logging.getLogger(__name__)
         self.logger.info("RPI_dal init")
@@ -43,6 +43,15 @@ class RPI_dal():
             self.relay.direction = digitalio.Direction.OUTPUT
             # Negative logic
             self.relay.value = True
+
+    def __exit__(self):
+        # Exit DHT22 sensor, mcp and relay
+        try:
+            self.DHT_SENSOR.exit()
+            self.mcp.deinit()
+            self.relay.deinit()
+        except:
+            self.logger.exception("!! RPI_dal deinit error: Couldn't exit DHT22 sensor, mcp and relay !!")
 
     def remap_range(value, left_min, left_max, right_min, right_max):
         # This remaps a value from original (left) range to new (right) range
