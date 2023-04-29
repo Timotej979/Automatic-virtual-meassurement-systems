@@ -1,4 +1,4 @@
-import logging, os, time, board, busio, digitalio
+import logging, os, time, datetime, board, busio, digitalio
 import adafruit_dht as adafruit_dht
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
@@ -91,7 +91,7 @@ class RPI_dal():
                 try:
                     # Read temperature from sensor and get timestamp
                     humidity, temperature = self.DHT_SENSOR.temperature, self.DHT_SENSOR.humidity
-                    timestamp = time.time()
+                    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                     reading = True
                 except RuntimeError as rerror:
                     # Reading failed, retry
@@ -145,7 +145,7 @@ class RPI_dal():
                         try:
                             # Read temperature from sensor and get timestamp
                             humidity, temperature = self.DHT_SENSOR.temperature, self.DHT_SENSOR.humidity
-                            timestamp = time.time()
+                            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                             reading = True
                         except RuntimeError as rerror:
                             # Reading failed, retry
@@ -184,7 +184,7 @@ class RPI_dal():
 
             # Read soil moisture from sensor and get timestamp
             soil_moisture = self.soil_moisture_chan.value
-            timestamp = time.time()
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
             # Remap soil moisture value
             soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
@@ -220,7 +220,7 @@ class RPI_dal():
                 for i in range(numOfReadings):
                     # Read soil moisture from sensor and get timestamp
                     soil_moisture = self.soil_moisture_chan.value
-                    timestamp = time.time()
+                    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
                     # Remap soil moisture value
                     soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
@@ -247,7 +247,7 @@ class RPI_dal():
 
             # Set relay state to OFF
             self.relay.value = True
-            timestamp = time.time()
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
             # Log relay state
             self.logger.info("## Relay state: False ##")
@@ -265,7 +265,7 @@ class RPI_dal():
 
             # Set relay state to ON
             self.relay.value = False
-            timestamp = time.time()
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
             # Log relay state
             self.logger.info("## Relay state: True ##")
