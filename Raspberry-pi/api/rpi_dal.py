@@ -42,7 +42,16 @@ class RPI_dal():
             self.relay = digitalio.DigitalInOut(getattr(board, "D" + str(self.RELAY_PIN)))
             self.relay.direction = digitalio.Direction.OUTPUT
 
-        
+    def remap_range(value, left_min, left_max, right_min, right_max):
+        # This remaps a value from original (left) range to new (right) range
+        # Figure out how 'wide' each range is
+        left_span = left_max - left_min
+        right_span = right_max - right_min
+        # Convert the left range into a 0-1 range (int)
+        valueScaled = int(value - left_min) / int(left_span)
+        # Convert the 0-1 range into a value in the right range.
+        return int(right_min + (valueScaled * right_span))
+
     # GET one Temperature meassurement
     async def get_air_temperature_humidity(self):
         # Read temperature from sensor and get timestamp
@@ -153,6 +162,9 @@ class RPI_dal():
             soil_moisture = self.soil_moisture_chan.value
             timestamp = time.time()
 
+            # Remap soil moisture value
+            soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
+
             # Log timestamp and soil moisture
             self.logger.info("## Timestamp: " + str(timestamp) + " ##")
             self.logger.info("## Soil moisture: " + str(soil_moisture) + " ##")
@@ -185,6 +197,9 @@ class RPI_dal():
                     # Read soil moisture from sensor and get timestamp
                     soil_moisture = self.soil_moisture_chan.value
                     timestamp = time.time()
+
+                    # Remap soil moisture value
+                    soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
 
                     # Log timestamp and soil moisture
                     self.logger.info("## Timestamp: " + str(timestamp) + " ##")
