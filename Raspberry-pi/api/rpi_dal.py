@@ -96,8 +96,8 @@ class RPI_dal():
                 except RuntimeError as rerror:
                     # Reading failed, retry
                     self.logger.warning("!! GET single air temperature/humidity reading error: Couldn't read DHT22 temperature/humidity !!")
-                    self.logger.warning("!! GET single air temperature/humidity reading error: Retrying in 1 seconds !!")
-                    time.sleep(1.0)
+                    self.logger.warning("!! GET single air temperature/humidity reading error: Retrying in 2 seconds !!")
+                    time.sleep(2.0)
                     continue
                 except Exception as error:
                     # Reading failed, retry
