@@ -56,7 +56,7 @@ class RPI_dal():
             while not reading:
                 try:
                     # Read temperature from sensor and get timestamp
-                    humidity, temperature = adafruit_dht.temperature, adafruit_dht.humidity
+                    humidity, temperature = self.DHT_SENSOR.temperature, self.DHT_SENSOR.humidity
                     timestamp = time.time()
                     reading = True
                 except RuntimeError as rerror:
@@ -111,7 +111,7 @@ class RPI_dal():
                     while not reading:
                         try:
                             # Read temperature from sensor and get timestamp
-                            humidity, temperature = adafruit_dht.temperature, adafruit_dht.humidity
+                            humidity, temperature = self.DHT_SENSOR.temperature, self.DHT_SENSOR.humidity
                             timestamp = time.time()
                             reading = True
                         except RuntimeError as rerror:
