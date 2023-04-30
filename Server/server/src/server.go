@@ -592,7 +592,7 @@ func fiber_server(db *gorm.DB, conf *Config) {
 	api.Get("/get-bulk-soil-moisture", getBulkSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
 
 	// Get relay state
-	api.Get("/set-relay-state-OFF", setRelayStateOFF(db, RPI_API_CONNECTION_STRING))
+	api.Post("/set-relay-state-OFF", setRelayStateOFF(db, RPI_API_CONNECTION_STRING))
 
 	// Post change relay state
 	api.Post("/set-relay-state-ON", setRelayStateON(db, RPI_API_CONNECTION_STRING))

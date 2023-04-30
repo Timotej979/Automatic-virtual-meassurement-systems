@@ -1,3 +1,7 @@
+DB CONNECTION:
+    psql postgres://admin:RaspbianPi@db:5432/RPIdatabase
+    psql postgres://admin:RaspbianPi@127.0.0.1:6666/RPIdatabase
+
 TEST REQUESTS:
 
     HEALTHCHECK:
@@ -9,11 +13,11 @@ TEST REQUESTS:
         curl --request GET --header "Content-Type: application/json" --data '{"numOfReadings": 10}' http://127.0.0.1:5001/goserver/v1/api/get-bulk-air-temperature-humidity
 
     SOIL SENSOR READINGS:
-        curl --request GET http://127.0.0.1:5001/go-server/v1/api/get-soil-humidity
+        curl --request GET http://127.0.0.1:5001/goserver/v1/api/get-soil-moisture
 
-        curl --request GET --header "Content-Type: application/json" --data '{"numOfReadings": 10}' http://127.0.0.1:5001/goserver/v1/api/get-bulk-soil-humidity
+        curl --request GET --header "Content-Type: application/json" --data '{"numOfReadings": 10}' http://127.0.0.1:5001/goserver/v1/api/get-bulk-soil-moisture
 
     RELAY STATE:
-        curl --request POST http://127.0.0.1:5001/goserver/v1/api/setRelayOFF
+        curl --request POST http://127.0.0.1:5001/goserver/v1/api/set-relay-state-OFF
 
-        curl --request POST http://127.0.0.1:5001/goserver/v1/api/setRelayON
+        curl --request POST http://127.0.0.1:5001/goserver/v1/api/set-relay-state-ON
