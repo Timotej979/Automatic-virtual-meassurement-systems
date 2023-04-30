@@ -1,5 +1,5 @@
 import { Inter } from 'next/font/google'
-import { Dashboard, Box, Button } from '@/components/Dashboard'
+import { Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater } from '@/components/Dashboard'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -78,49 +78,106 @@ const DashboardPage: React.FC = () => {
     return (
       <main>
         <Dashboard>
+
+          <FirstPart >
+            
+            <Box title="AIR TEMPERATURE AND HUMIDITY">
+              <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
+                Air temperature: 0°C
+              </div>  
+            </Box>
+            
+            <Box title="SOIL MOISTURE">
+              <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
+                Soil moisture: 0%
+              </div>
+            </Box>
+            
+          </FirstPart>
+
+          <SecondPart>
+            <Box title="MEASSUREMENT TABLE">
+              <div>
+                <table className="table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Date</th>
+                      <th className="px-4 py-2">Air temperature</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+
+              <div>
+                <table className="table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Date</th>
+                      <th className="px-4 py-2">Air humidity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+
+              <div>
+                <table className="table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Date</th>
+                      <th className="px-4 py-2">Soil moisture</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+
+              <div>
+                <table className="table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Date</th>
+                      <th className="px-4 py-2">Watering</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </Box>
+          </SecondPart>
           
-          <Box title="AIR TEMPERATURE AND HUMIDITY">
-            {<p>Air temp</p>}
-          </Box>
+          <ThirdPart>
+            <Box title="CONTROL PANEL">
+              <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
+                <ButtonSensor onClick={() => console.log("READ AIR TEMPERATURE AND HUMIDITY")}>
+                  READ AIR TEMPERATURE AND HUMIDITY
+                </ButtonSensor>
 
-          <Box title="SOIL MOISTURE">
-            {/* Add box 2 content here */}
-          </Box>
-          
-          <Box title="CONTROL PANEL">
-            <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-              <Button onClick={() => console.log("READ AIR TEMPERATURE AND HUMIDITY")}>
-                READ AIR TEMPERATURE AND HUMIDITY
-              </Button>
+                <ButtonSensor onClick={() => console.log("READ SOIL MOISTURE")}>
+                  READ SOIL MOISTURE
+                </ButtonSensor>
 
-              <Button onClick={() => console.log("READ SOIL MOISTURE")}>
-                READ SOIL MOISTURE
-              </Button>
-            </div>
+                <ButtonAuto onClick={() => console.log("START AUTOMATIC WATERING")}>
+                  START AUTOMATIC WATERING
+                </ButtonAuto>
 
-            <div>
-              <Button onClick={() => console.log("START AUTOMATIC WATERING")}>
-                START AUTOMATIC WATERING
-              </Button>
+                <ButtonAuto onClick={() => console.log("STOP AUTOMATIC WATERING")}>
+                  STOP AUTOMATIC WATERING
+                </ButtonAuto>
+              </div>
 
-              <Button onClick={() => console.log("STOP AUTOMATIC WATERING")}>
-                STOP AUTOMATIC WATERING
-              </Button>
-            </div>
-
-            <div>
-              <Button onClick={() => console.log("WATER THE PLANT")}>
-                WATER THE PLANT
-              </Button>
-            </div>
-          </Box>
-
-          <Box title="MEASSUREMENT TABLE">
-            <div>
-
-            </div>
-          </Box>
-
+              <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
+                <ButtonWater onClick={() => console.log("WATER THE PLANT")}>
+                  WATER THE PLANT
+                </ButtonWater>
+              </div>
+            </Box>
+          </ThirdPart>
           {}
         </Dashboard>
       </main>

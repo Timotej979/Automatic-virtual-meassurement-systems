@@ -9,12 +9,50 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ children }) => {
   return (
     <main className={styles.page_container}>
-      {/* Add your dashboard content here */}
-      {children}
+      <div className={styles.container}>
+        {/* Add your dashboard content here */}
+        {children}
+      </div>
     </main>
   );
 };
 
+// First part component
+interface FirstPartProps {
+  children: React.ReactNode;
+}
+const FirstPart: React.FC<FirstPartProps> = ({ children }) => {
+  return (
+    <div className={`${styles.first_part} ${styles.container}`}>
+      {children}
+    </div>
+  );
+};
+
+// Second part component
+interface SecondPartProps {
+  children: React.ReactNode;
+}
+const SecondPart: React.FC<SecondPartProps> = ({ children }) => {
+  return (
+    <div className={`${styles.second_part} ${styles.container}`}>
+      {children}
+    </div>
+  );
+};
+
+
+// Third part component
+interface ThirdPartProps {
+  children: React.ReactNode;
+}
+const ThirdPart: React.FC<ThirdPartProps> = ({ children }) => {
+  return (
+    <div className={`${styles.third_part} ${styles.container}`}>
+      {children}
+    </div>
+  );
+};
 
 // Box component
 interface BoxProps {
@@ -33,18 +71,33 @@ const Box: React.FC<BoxProps> = ({ title, children}) => {
   );
 };
 
-// Button component
+// Button components
 interface ButtonProps {
   children: ReactNode;
   onClick: () => void;
 }
-const Button: React.FC<ButtonProps> = ({ children, onClick }) => {
+const ButtonSensor: React.FC<ButtonProps> = ({ children, onClick }) => {
   return (
-    <button className={styles.btn_grad} onClick={onClick}>
+    <button className={styles.btn_sensor_grad} onClick={onClick}>
       {children}
     </button>
   );
 };
 
+const ButtonAuto: React.FC<ButtonProps> = ({ children, onClick }) => {
+  return (
+    <button className={styles.btn_auto_grad} onClick={onClick}>
+      {children}
+    </button>
+  );
+};
 
-export {Dashboard, Box, Button};
+const ButtonWater: React.FC<ButtonProps> = ({ children, onClick }) => {
+  return (
+    <button className={styles.btn_water_grad} onClick={onClick}>
+      {children}
+    </button>
+  );
+};
+
+export {Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater};

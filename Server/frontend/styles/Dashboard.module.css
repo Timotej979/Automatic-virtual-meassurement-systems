@@ -1,15 +1,45 @@
+/* Whole webpage background style */
 .page_container {
+  margin: 0;
+  padding: 0;
   height:100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  /*background: linear-gradient(to bottom, #87ceeb 50%, #32cd32 70%, #8b4513 90%);*/
   background-image: linear-gradient(-165deg,#ff0,transparent 30%),
                     linear-gradient(180deg,#87ceeb 50%,#32cd32 52%,#8b4513 70%);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-  
+
+/* Split the webpage into 3 parts inside container */
+.container {
+  display: flex;
+  height: 100%;
+}
+
+/* Set the first part */
+.first_part {
+  flex: 0 0 80%; /* sets the flex basis to 80% and disables growth and shrinking */
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Set the second part */
+.second_part {
+  flex: 0 0 20%; /* sets the flex basis to 20% and disables growth and shrinking */
+  height: 70%;
+}
+
+/* Set the third part */
+.third_part {
+  height: 30%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+/* Separate boxes inside the parts */
 .box_container {
   display: flex;
   flex-direction: column;
@@ -23,17 +53,19 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Set the box title */
 .box_title {
   font-size: 1.5rem;
   font-weight: 900;
   color: #fff;
   margin-bottom: 1rem;
 }
-       
-.btn_grad {
-  background-image: linear-gradient(to right, #87ceeb 0%, rgba(255, 255, 0, 0.575)  51%, #87ceeb  100%);
+
+/* Set different button styles */
+.btn_sensor_grad {
+  background-image: linear-gradient(to right, #8b4513 0%, #32cd32  51%, #8b4513  100%);
   margin: 10px;
-  padding: 15px 45px;
+  padding: 15px 30px;
   text-align: center;
   text-transform: uppercase;
   font-weight: 600;
@@ -45,7 +77,49 @@
   display: block;
 }
 
-.btn_grad:hover {
+.btn_sensor_grad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn_auto_grad {
+  background-image: linear-gradient(to right, #8b1313 0%, #32cd32  51%, #8b1313  100%);
+  margin: 10px;
+  padding: 15px 30px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;            
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  display: block;
+}
+
+.btn_auto_grad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn_water_grad {
+  background-image: linear-gradient(to right, #87ceeb 0%, #ff0  51%, #87ceeb  100%);
+  margin: 10px;
+  padding: 15px 30px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;            
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  display: block;
+}
+
+.btn_water_grad:hover {
   background-position: right center; /* change the direction of the change here */
   color: #fff;
   text-decoration: none;
