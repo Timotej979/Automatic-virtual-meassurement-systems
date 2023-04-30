@@ -329,6 +329,9 @@ func getBulkAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_S
 			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
+		// Print the response body
+		log.Println("## Go-server API response body: ##")
+
 		var resp BulkAirTemperatureHumidityResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
 			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
@@ -432,6 +435,9 @@ func getBulkSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING stri
 			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
+		// Print the response body
+		log.Println("## Response body: ", string(body))
+
 		var resp BulkSoilMoistureResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
 			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
@@ -481,6 +487,9 @@ func setRelayStateOFF(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber
 			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
+		// Print the response body
+		log.Println("## Response body: ", string(body), " ##")
+
 		var resp RelayStateResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
 			log.Fatalln("!! Unmarshal Go-server API response error !!", err)
@@ -527,6 +536,9 @@ func setRelayStateON(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.
 			log.Fatalln("!! Read Go-server API response error !!")
 			log.Fatalln(err)
 		}
+
+		// Print the response body
+		log.Println("## Response body:", string(body), " ##")
 
 		var resp RelayStateResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
