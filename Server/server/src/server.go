@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"bytes"
 
 	// Library for http requests
 	"net/http"
@@ -238,6 +239,10 @@ type RelayStateResponse struct {
 	} `json:"message"`
 }
 
+type RequestBody struct {
+    NumOfReadings int `json:"numOfReadings"`
+}
+
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // //////////////////// FIBER ROUTES //////////////////////
 // //// API routes ////////
@@ -316,21 +321,29 @@ func getBulkAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_S
 		log.Println("## Get bulk air temperature and humidity ##")
 
 		// Make a request to a backend API
-		res, err := http.Get(RPI_API_CONNECTION_STRING + "/bulkAirTemperatureHumidityReading")
+		req, err := http.NewRequest("GET", RPI_API_CONNECTION_STRING+"/bulkAirTemperatureHumidityReading", bytes.NewBuffer(c.Body()))
 		if err != nil {
 			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/bulkAirTemperatureHumidityReading"+" !!")
-			log.Fatalln(err)
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		// Make the request and handle the response
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/bulkAirTemperatureHumidityReading"+" !!")
 		}
 		defer res.Body.Close()
+
+		// Check the response status code
+		if res.StatusCode != 200 {
+			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/bulkAirTemperatureHumidityReading"+" !!")
+		}
 
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
-
-		// Print the response body
-		log.Println("## Go-server API response body: ##")
 
 		var resp BulkAirTemperatureHumidityResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
@@ -423,10 +436,22 @@ func getBulkSoilMoistureRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRING stri
 		log.Println("## Get bulk soil humidity ##")
 
 		// Make a request to a backend API
-		res, err := http.Get(RPI_API_CONNECTION_STRING + "/bulkSoilMoistureReading")
+		req, err := http.NewRequest("GET", RPI_API_CONNECTION_STRING+"/bulkSoilMoistureReading", bytes.NewBuffer(c.Body()))
 		if err != nil {
 			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/bulkSoilMoistureReading"+" !!")
-			log.Fatalln(err)
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		// Make the request and handle the response
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/bulkSoilMoistureReading"+" !!")
+		}
+		defer res.Body.Close()
+
+		// Check the response status code
+		if res.StatusCode != 200 {
+			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/bulkSoilMoistureReading"+" !!")
 		}
 
 		// Read the response body
@@ -475,28 +500,27 @@ func setRelayStateOFF(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber
 		log.Println("## Set relay state OFF ##")
 
 		// Make a request to a backend API
-		res, err := http.Get(RPI_API_CONNECTION_STRING + "/relayState")
+		res, err := http.Post(RPI_API_CONNECTION_STRING+"/setRelayOFF", "application/json", nil)
 		if err != nil {
-			log.Fatalln("!! GET Go-server API error: ", RPI_API_CONNECTION_STRING+"/relayState"+" !!")
+			log.Fatalln("!! POST Go-server API error !!")
 			log.Fatalln(err)
 		}
 
 		// Read the response body
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalln("!! Read Go-server API response error: ", err)
+			log.Fatalln("!! Read Go-server API response error !!")
+			log.Fatalln(err)
 		}
-
-		// Print the response body
-		log.Println("## Response body: ", string(body), " ##")
 
 		var resp RelayStateResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
-			log.Fatalln("!! Unmarshal Go-server API response error !!", err)
+			log.Fatalln("!! Unmarshal Go-server API response error !!")
+			log.Fatalln(err)
 		}
 
 		// Access the values in the struct
-		log.Println("## Relay state: ", resp.Message.RelayState, " ##")
+		log.Println("## Relay state:", resp.Message.RelayState, " ##")
 
 		// Save the data to the database
 		err = executeInTransaction(db, func(tx *gorm.DB) error {
@@ -524,7 +548,7 @@ func setRelayStateON(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.
 		log.Println("## Set relay state ON ##")
 
 		// Make a request to a backend API
-		res, err := http.Post(RPI_API_CONNECTION_STRING+"/changeRelayState", "application/json", nil)
+		res, err := http.Post(RPI_API_CONNECTION_STRING+"/setRelayON", "application/json", nil)
 		if err != nil {
 			log.Fatalln("!! POST Go-server API error !!")
 			log.Fatalln(err)
@@ -536,9 +560,6 @@ func setRelayStateON(db *gorm.DB, RPI_API_CONNECTION_STRING string) func(*fiber.
 			log.Fatalln("!! Read Go-server API response error !!")
 			log.Fatalln(err)
 		}
-
-		// Print the response body
-		log.Println("## Response body:", string(body), " ##")
 
 		var resp RelayStateResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
