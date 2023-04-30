@@ -28,19 +28,19 @@ import (
 
 type AirTemperature struct {
 	ID        int             `gorm:"primaryKey"`
-	Value     decimal.Decimal `gorm:"type:decimal(7,6);column:value"`
+	Value     decimal.Decimal `gorm:"type:decimal(8,2);column:value"`
 	Timestamp time.Time       `gorm:"column:timestamp"`
 }
 
 type AirHumidity struct {
 	ID        int             `gorm:"primaryKey"`
-	Value     decimal.Decimal `gorm:"type:decimal(7,6);column:value"`
+	Value     decimal.Decimal `gorm:"type:decimal(8,2);column:value"`
 	Timestamp time.Time       `gorm:"column:timestamp"`
 }
 
 type SoilMoisture struct {
 	ID        int             `gorm:"primaryKey"`
-	Value     decimal.Decimal `gorm:"type:decimal(7,6);column:value"`
+	Value     decimal.Decimal `gorm:"type:decimal(8,2);column:value"`
 	Timestamp time.Time       `gorm:"column:timestamp"`
 }
 
