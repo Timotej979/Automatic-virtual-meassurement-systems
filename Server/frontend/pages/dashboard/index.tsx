@@ -1,73 +1,143 @@
 import { Inter } from 'next/font/google'
-import { Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater } from '@/components/Dashboard'
+import { Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater, ThresholdSlider } from '@/components/Dashboard'
 
 const inter = Inter({ subsets: ['latin'] })
 
 
-// Automatic watering class
-class automaticWateringClass {
-  // Kill switch
-  killSwitch: boolean;
-  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Update table class
+class updateTables {
+  // Number of rows to display
+  numOfRows: number;
+
   // Constructor
   constructor() {
-    // Set the kill switch to false
-    this.killSwitch = false;
+    // Set the number of rows to display (-1)
+    this.numOfRows = 4;
   }
 
-  // Start automatic watering
-  async startAutomaticWatering() {
-    console.log("## Automatic watering started ##");
-    // Set the kill switch to false
-    this.killSwitch = false;
+  async updateAirTemperatureTable(temperature: number, timestamp: string) {
+    // Get AirTemperatureTable and add a new row
+    const airTemperatureTable = document.getElementById("airTemperatureTable")! as  HTMLTableElement;
 
-    // Start automatic watering
-    this.automaticWatering(50);
+    // Create a new row and cells
+    const newRow = airTemperatureTable.insertRow(1);
+    const newCell1 = newRow.insertCell(0);
+    const newCell2 = newRow.insertCell(1);
+
+    // Set cell style
+    newCell1.style.textAlign = "center";
+    newCell2.style.textAlign = "center";
+
+    // Add the data to the cell and reformat the timestamp
+    newCell1.innerHTML = temperature.toString();
+    timestamp = timestamp.replace("T", " ");
+    timestamp = timestamp.replace("Z", "");
+    newCell2.innerHTML = timestamp;
+
+    // Remove the last row if there are more than 10 rows
+    if (airTemperatureTable.rows.length > this.numOfRows) {
+      airTemperatureTable.deleteRow(this.numOfRows);
+    }
   }
 
-  // Stop automatic watering
-  async stopAutomaticWatering() {
-    console.log("## Automatic watering stopped ##");
-    // Stop automatic watering by setting the kill switch to true
-    this.killSwitch = true;
+  async updateAirHumidityTable(humidity: number, timestamp: string) {
+    // Get AirHumidityTable and add a new row
+    const airHumidityTable = document.getElementById("airHumidityTable")! as HTMLTableElement;
+
+    // Create a new row and cells
+    const newRow = airHumidityTable.insertRow(1);
+    const newCell1 = newRow.insertCell(0);
+    const newCell2 = newRow.insertCell(1);
+
+     // Set cell style
+     newCell1.style.textAlign = "center";
+     newCell2.style.textAlign = "center";
+
+    // Add the data to the cell and reformat the timestamp
+    newCell1.innerHTML = humidity.toString();
+    timestamp = timestamp.replace("T", " ");
+    timestamp = timestamp.replace("Z", "");
+    newCell2.innerHTML = timestamp;
+
+    // Remove the last row if there are more than 10 rows
+    if (airHumidityTable.rows.length > this.numOfRows) {
+      airHumidityTable.deleteRow(this.numOfRows);
+    }
   }
 
-  // Automatic watering loop
-  async automaticWatering(threshold: number) {
-    // While loop to keep watering until the soil is wet enough then wait
-    while (true) {
-      // Get the current soil moisture
-      const soilHumidity = 0;
+  async updateSoilMoistureTable(moisture: number, timestamp: string) {
+    // Get SoilMoistureTable and add a new row
+    const soilMoistureTable = document.getElementById("soilMoistureTable")! as HTMLTableElement;
 
-      // If the soil is wet enough, stop watering
-      if (soilHumidity >= threshold) {
-        // Stop watering the plant
-        // Send request to localhost/changeRelayState
-        console.log("# Stop watering #");
-      } else {
-        // Water the plant for 5 seconds
-        // Send request to localhost/changeRelayState
-        console.log("# Watering #");
-      }
+    // Create a new row and cells
+    const newRow = soilMoistureTable.insertRow(1);
+    const newCell1 = newRow.insertCell(0);
+    const newCell2 = newRow.insertCell(1);
 
-      // If the kill switch is on, stop watering
-      if (this.killSwitch) {
-        // Exit while loop
-        break;
-      }
+     // Set cell style
+     newCell1.style.textAlign = "center";
+     newCell2.style.textAlign = "center";
+
+    // Add the data to the cell and reformat the timestamp
+    newCell1.innerHTML = moisture.toString();
+    timestamp = timestamp.replace("T", " ");
+    timestamp = timestamp.replace("Z", "");
+    newCell2.innerHTML = timestamp;
+
+    // Remove the last row if there are more than 10 rows
+    if (soilMoistureTable.rows.length > this.numOfRows) {
+      soilMoistureTable.deleteRow(this.numOfRows);
+    }
+  }
+
+  async updateRelayStateTable(relayState: boolean, timestamp: string) {
+    // Get RelayStateTable and add a new row
+    const relayStateTable = document.getElementById("relayStateTable")! as HTMLTableElement;
+
+    // Create a new row and cells
+    const newRow = relayStateTable.insertRow(1);
+    const newCell1 = newRow.insertCell(0);
+    const newCell2 = newRow.insertCell(1);
+
+     // Set cell style
+     newCell1.style.textAlign = "center";
+     newCell2.style.textAlign = "center";
+
+    // Add the data to the celland rephrase the boolean and reformat the timestamp
+    if (relayState) {
+      newCell1.innerHTML = "ON";
+      timestamp = timestamp.replace("T", " ");
+      timestamp = timestamp.replace("Z", "");
+      newCell2.innerHTML = timestamp;
+    } else {
+      newCell1.innerHTML = "OFF";
+      timestamp = timestamp.replace("T", " ");
+      timestamp = timestamp.replace("Z", "");
+      newCell2.innerHTML = timestamp;
+    }
+
+    // Remove the last row if there are more than 10 rows
+    if (relayStateTable.rows.length > this.numOfRows) {
+      relayStateTable.deleteRow(this.numOfRows);
     }
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// API REQUEST CLASS 
 class apiRequestClass {
-  
   // Define root url to make requests to API
   rootUrl: string;
+  // Define updateTables class
+  updateTables: updateTables;
 
   // Constructor
   constructor() {
     // Set the root url
     this.rootUrl = "http://localhost:5001/goserver/v1/api";
+    // Set the updateTables class
+    this.updateTables = new updateTables();
   }
 
   async getAirTemperatureHumidity() {
@@ -79,25 +149,18 @@ class apiRequestClass {
       },
     });
 
-    // Get the response data
+    // Get the response data, stringify it, and parse it correctly
     const data = await response.json();
-
-    // Get the JSON data
-    const jsonData = JSON.parse(data);
-
-    // Get "message" from the JSON data
+    const dataString = JSON.stringify(data);
+    const jsonData = JSON.parse(dataString);
     const message = jsonData["message"];
-
-    // Get air-temperature and air-humidity and timestamp from the message
     const airTemperature = message["air-temperature"];
     const airHumidity = message["air-humidity"];
     const timestamp = message["timestamp"];
 
-    // Print the data
-    console.log("## Air temperature and humidity ##");
-    console.log(`Air temperature: ${airTemperature}`);
-    console.log(`Air humidity: ${airHumidity}`);
-    console.log(`Timestamp: ${timestamp}`);
+    // Update the tables
+    this.updateTables.updateAirTemperatureTable(airTemperature, timestamp);
+    this.updateTables.updateAirHumidityTable(airHumidity, timestamp);
 
     // Return the data
     return [airTemperature, airHumidity, timestamp];
@@ -106,7 +169,7 @@ class apiRequestClass {
   async getBulkAirTemperatureHumidity(numOfReadings: number) {
     // Make a request to the server and add JSON data "numOfReadings"
     const response = await fetch(`${this.rootUrl}/get-bulk-air-temperature-humidity`, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -115,25 +178,20 @@ class apiRequestClass {
       }),
     });
 
-    // Get the response data
+    // Get the response data, stringify it, and parse it correctly
     const data = await response.json();
-
-    // Get the JSON data
-    const jsonData = JSON.parse(data);
-
-    // Get "message" from the JSON data
-    const message = jsonData["message"];
-
-    // Get air-temperature-list, air-humidity-list and timestamp-list from the message    
+    const dataString = JSON.stringify(data);
+    const jsonData = JSON.parse(dataString);
+    const message = jsonData["message"];   
     const airTemperatureList = message["air-temperature-list"];
     const airHumidityList = message["air-humidity-list"];
     const timestampList = message["timestamp-list"];
 
-    // Print the data
-    console.log("## Bulk air temperature and humidity ##");
-    console.log(`Air temperature list: ${airTemperatureList}`);
-    console.log(`Air humidity list: ${airHumidityList}`);
-    console.log(`Timestamp list: ${timestampList}`);
+    // Update the tables
+    for (let i = 0; i < numOfReadings; i++) {
+      this.updateTables.updateAirTemperatureTable(airTemperatureList[i], timestampList[i]);
+      this.updateTables.updateAirHumidityTable(airHumidityList[i], timestampList[i]);
+    }
 
     // Return the data
     return [airTemperatureList, airHumidityList, timestampList];
@@ -148,23 +206,16 @@ class apiRequestClass {
       },
     });
 
-    // Get the response data
+    // Get the response data, stringify it, and parse it correctly
     const data = await response.json();
-
-    // Get the JSON data
-    const jsonData = JSON.parse(data);
-
-    // Get "message" from the JSON data
+    const dataString = JSON.stringify(data);
+    const jsonData = JSON.parse(dataString);
     const message = jsonData["message"];
-
-    // Get soil-moisture and timestamp from the message
     const soilMoisture = message["soil-moisture"];
     const timestamp = message["timestamp"];
 
-    // Print the data
-    console.log("## Soil moisture ##");
-    console.log(`Soil moisture: ${soilMoisture}`);
-    console.log(`Timestamp: ${timestamp}`);
+    // Update the tables
+    this.updateTables.updateSoilMoistureTable(soilMoisture, timestamp);
 
     // Return the data
     return [soilMoisture, timestamp];
@@ -173,7 +224,7 @@ class apiRequestClass {
   async getBulkSoilMoisture(numOfReadings: number) {
     // Make a request to the server and add JSON data "numOfReadings"
     const response = await fetch(`${this.rootUrl}/get-bulk-soil-moisture`, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -182,23 +233,18 @@ class apiRequestClass {
       }),
     });
     
-    // Get the response data
+    // Get the response data, stringify it, and parse it correctly
     const data = await response.json();
-
-    // Get the JSON data
-    const jsonData = JSON.parse(data);
-
-    // Get "message" from the JSON data
+    const dataString = JSON.stringify(data);
+    const jsonData = JSON.parse(dataString);
     const message = jsonData["message"];
-
-    // Get soil-moisture-list and timestamp-list from the message
     const soilMoistureList = message["soil-moisture-list"];
     const timestampList = message["timestamp-list"];
 
-    // Print the data
-    console.log("## Bulk soil moisture ##");
-    console.log(`Soil moisture list: ${soilMoistureList}`);
-    console.log(`Timestamp list: ${timestampList}`);
+    // Update the tables
+    for (let i = 0; i < numOfReadings; i++) {
+      this.updateTables.updateSoilMoistureTable(soilMoistureList[i], timestampList[i]);
+    }
 
     // Return the data
     return [soilMoistureList, timestampList];
@@ -213,24 +259,19 @@ class apiRequestClass {
       },
     });
 
-    // Get the response data
+    // Get the response data, stringify it, and parse it correctly
     const data = await response.json();
-
-    // Get the JSON data
-    const jsonData = JSON.parse(data);
-
-    // Get "message" from the JSON data
+    const dataString = JSON.stringify(data);
+    const jsonData = JSON.parse(dataString);
     const message = jsonData["message"];
-
-    // Get relay-state from the message
     const relayState = message["relay-state"];
+    const timestamp = message["timestamp"];
 
-    // Print the data
-    console.log("## Relay state ##");
-    console.log(`Relay state: ${relayState}`);
+    // Update the tables
+    this.updateTables.updateRelayStateTable(relayState, timestamp);
 
     // Return the data
-    return relayState;
+    return [relayState, timestamp];
   }
 
   async setRelayStateOFF() {
@@ -242,38 +283,114 @@ class apiRequestClass {
       },
     });
 
-    // Get the response data
+    // Get the response data, stringify it, and parse it correctly
     const data = await response.json();
-
-    // Get the JSON data
-    const jsonData = JSON.parse(data);
-
-    // Get "message" from the JSON data
+    const dataString = JSON.stringify(data);
+    const jsonData = JSON.parse(dataString);
     const message = jsonData["message"];
-
-    // Get relay-state from the message
     const relayState = message["relay-state"];
+    const timestamp = message["timestamp"];
 
-    // Print the data
-    console.log("## Relay state ##");
-    console.log(`Relay state: ${relayState}`);
+    // Update the tables
+    this.updateTables.updateRelayStateTable(relayState, timestamp);
 
     // Return the data
-    return relayState;
+    return [relayState, timestamp];
+  }
+} 
+
+
+
+// Automatic watering class
+class automaticWateringClass {
+  // Kill switch
+  killSwitch: boolean;
+  // Api request class instance
+  apiRequestClassInstance: apiRequestClass;
+  
+  // Constructor
+  constructor() {
+    // Set the kill switch to false
+    this.killSwitch = false;
+    // Create an instance of the api request class
+    this.apiRequestClassInstance = new apiRequestClass();
   }
 
+  // Start automatic watering
+  async startAutomaticWatering() {
+    console.log("## Automatic watering started ##");
+    // Set the kill switch to false
+    this.killSwitch = false;
+
+    // Get the threshold
+    const threshold = 50//document.getElementById("threshold")!.value;
+
+    // Start automatic watering
+    this.automaticWatering(threshold);
+  }
+
+  // Stop automatic watering
+  async stopAutomaticWatering() {
+    console.log("## Automatic watering stopped ##");
+    // Stop automatic watering by setting the kill switch to true
+    this.killSwitch = true;
+  }
+
+  // Automatic watering loop
+  async automaticWatering(threshold: number) {
+    // While loop to keep watering until the soil is wet enough then wait
+    while (true) {
+      // Get the current soil moisture
+      const soilMoistureArray = await this.apiRequestClassInstance.getSoilMoisture();
+
+      // If the soil is wet enough, stop watering
+      if (soilMoistureArray[0] >= threshold) {
+        // Stop watering the plant
+        const relayState = await this.apiRequestClassInstance.setRelayStateOFF();
+
+        while (relayState[0] != false) {
+          // Wait for 2 seconds and try again
+          new Promise((resolve) => setTimeout(resolve, 2000));
+          const relayState = await this.apiRequestClassInstance.setRelayStateOFF();
+        }
+
+      } else {
+        // Water the plant for 5 seconds
+        const relayState = await this.apiRequestClassInstance.setRelayStateON();
+
+        while (relayState[0] != true) {
+          // Wait for 2 second and try again
+          new Promise((resolve) => setTimeout(resolve, 2000));
+          const relayState = await this.apiRequestClassInstance.setRelayStateON();
+        }
+      }
+
+      // If the kill switch is on, stop watering
+      if (this.killSwitch) {
+        // Exit while loop
+        break;
+      }
+    }
+  }
 }
 
+// Create automatic watering class instance
+const automaticWateringClassInstance = new automaticWateringClass;
+const apiRequestClassInstance = new apiRequestClass;
 
-// Create instances of used classes
-const apiRequestClassInstance = new apiRequestClass();
-const automaticWateringClassInstance = new automaticWateringClass();
-
-// Call the methods from apiRequestClassInstance
-apiRequestClassInstance.getAirTemperatureHumidity();
+// Make 10 requests for the air temperature and humidity
 apiRequestClassInstance.getBulkAirTemperatureHumidity(10);
-apiRequestClassInstance.getSoilMoisture();
+
+// Make 10 requests for the soil moisture
 apiRequestClassInstance.getBulkSoilMoisture(10);
+
+// Make 10 changes to the relay state
+apiRequestClassInstance.setRelayStateON();
+apiRequestClassInstance.setRelayStateOFF();
+apiRequestClassInstance.setRelayStateON();
+apiRequestClassInstance.setRelayStateOFF();
+apiRequestClassInstance.setRelayStateON();
+apiRequestClassInstance.setRelayStateOFF();
 apiRequestClassInstance.setRelayStateON();
 apiRequestClassInstance.setRelayStateOFF();
 
@@ -302,57 +419,55 @@ const DashboardPage: React.FC = () => {
           </FirstPart>
 
           <SecondPart>
-            <Box title="MEASSUREMENT TABLE">
-              <div>
-                <table className="table-auto">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2">Date</th>
-                      <th className="px-4 py-2">Air temperature</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
+            <Box title="LATEST MEASUREMENTS">
+              <div className="flex flex-col gap-4 h-full">
+                <div className="flex-grow lg:flex-basis-25">
+                  <table id="airTemperatureTable" className="table-auto w-full">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2">Air Temperature</th>
+                        <th className="px-4 py-2">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
 
-              <div>
-                <table className="table-auto">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2">Date</th>
-                      <th className="px-4 py-2">Air humidity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
+                <div className="flex-grow lg:flex-basis-25">
+                  <table id="airHumidityTable" className="table-auto w-full">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2">Air humidity</th>
+                        <th className="px-4 py-2">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
 
-              <div>
-                <table className="table-auto">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2">Date</th>
-                      <th className="px-4 py-2">Soil moisture</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
+                <div className="flex-grow lg:flex-basis-25">
+                  <table id="soilMoistureTable" className="table-auto w-full">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2">Soil moisture</th>
+                        <th className="px-4 py-2">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
 
-              <div>
-                <table className="table-auto">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2">Date</th>
-                      <th className="px-4 py-2">Watering</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
+                <div className="flex-grow lg:flex-basis-25">
+                  <table id="relayStateTable" className="table-auto w-full">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2">Watering</th>
+                        <th className="px-4 py-2">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
               </div>
             </Box>
           </SecondPart>

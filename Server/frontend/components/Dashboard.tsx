@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import Chart from 'chart.js/auto';
+import Slider from '@mui/material/Slider';
+import { jsx } from '@emotion/react';
 import styles from '../styles/Dashboard.module.css';
 
 
@@ -64,10 +66,10 @@ const Box: React.FC<BoxProps> = ({ title, children}) => {
   return (
     <div className={styles.box_container}>
       <h2 className={styles.box_title}>{title}</h2>
-      <p>
+      <div>
         {/* Add your box content here */}
         {children}
-      </p>
+      </div>
     </div>
   );
 };
@@ -84,7 +86,6 @@ const ButtonSensor: React.FC<ButtonProps> = ({ children, onClick }) => {
     </button>
   );
 };
-
 const ButtonAuto: React.FC<ButtonProps> = ({ children, onClick }) => {
   return (
     <button className={styles.btn_auto_grad} onClick={onClick}>
@@ -92,7 +93,6 @@ const ButtonAuto: React.FC<ButtonProps> = ({ children, onClick }) => {
     </button>
   );
 };
-
 const ButtonWater: React.FC<ButtonProps> = ({ children, onClick }) => {
   return (
     <button className={styles.btn_water_grad} onClick={onClick}>
@@ -101,6 +101,26 @@ const ButtonWater: React.FC<ButtonProps> = ({ children, onClick }) => {
   );
 };
 
+// Slider component
+interface ThresholdSliderProps {
+  value: number;
+  onChange: (event: Event, value: number | number[]) => void;
+}
+
+const ThresholdSlider: React.FC<ThresholdSliderProps> = ({ value, onChange }) => {
+  return (
+    <div className={styles.slider_container}>
+      <Slider
+        value={value}
+        onChange={onChange}
+        aria-label="Soil moisture threshold"
+        valueLabelDisplay="auto"
+        min={0}
+        max={100}
+      />
+    </div>
+  );
+};
 
 
-export {Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater};
+export {Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater, ThresholdSlider};

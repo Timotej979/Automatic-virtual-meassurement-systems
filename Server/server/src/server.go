@@ -608,13 +608,13 @@ func fiber_server(db *gorm.DB, conf *Config) {
 	api.Get("/get-air-temperature-humidity", getAirTemperatureHumidityRouteHandler(db, RPI_API_CONNECTION_STRING))
 
 	// Get bulk air temperature and humidity
-	api.Get("/get-bulk-air-temperature-humidity", getBulkAirTemperatureHumidityRouteHandler(db, RPI_API_CONNECTION_STRING))
+	api.Post("/get-bulk-air-temperature-humidity", getBulkAirTemperatureHumidityRouteHandler(db, RPI_API_CONNECTION_STRING))
 
 	// Get soil humidity
 	api.Get("/get-soil-moisture", getSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
 
 	// Get bulk soil humidity
-	api.Get("/get-bulk-soil-moisture", getBulkSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
+	api.Post("/get-bulk-soil-moisture", getBulkSoilMoistureRouteHandler(db, RPI_API_CONNECTION_STRING))
 
 	// Get relay state
 	api.Post("/set-relay-state-OFF", setRelayStateOFF(db, RPI_API_CONNECTION_STRING))
