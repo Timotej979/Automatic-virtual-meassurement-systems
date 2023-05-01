@@ -3,11 +3,17 @@ import { Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonA
 
 const inter = Inter({ subsets: ['latin'] })
 
-/*
+
 // Automatic watering class
 class automaticWateringClass {
   // Kill switch
   killSwitch: boolean;
+  
+  // Constructor
+  constructor() {
+    // Set the kill switch to false
+    this.killSwitch = false;
+  }
 
   // Start automatic watering
   async startAutomaticWatering() {
@@ -55,22 +61,221 @@ class automaticWateringClass {
 
 class apiRequestClass {
   
-  async getAirTemperatureHumidity() {
+  // Define root url to make requests to API
+  rootUrl: string;
 
-
-
-  async changeRelayState() {
-    // Send request to localhost/changeRelayState
+  // Constructor
+  constructor() {
+    // Set the root url
+    this.rootUrl = "http://localhost:5001/goserver/v1/api";
   }
+
+  async getAirTemperatureHumidity() {
+    // Make a request to the server
+    const response = await fetch(`${this.rootUrl}/get-air-temperature-humidity`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Get the response data
+    const data = await response.json();
+
+    // Get the JSON data
+    const jsonData = JSON.parse(data);
+
+    // Get "message" from the JSON data
+    const message = jsonData["message"];
+
+    // Get air-temperature and air-humidity and timestamp from the message
+    const airTemperature = message["air-temperature"];
+    const airHumidity = message["air-humidity"];
+    const timestamp = message["timestamp"];
+
+    // Print the data
+    console.log("## Air temperature and humidity ##");
+    console.log(`Air temperature: ${airTemperature}`);
+    console.log(`Air humidity: ${airHumidity}`);
+    console.log(`Timestamp: ${timestamp}`);
+
+    // Return the data
+    return [airTemperature, airHumidity, timestamp];
+  }
+
+  async getBulkAirTemperatureHumidity(numOfReadings: number) {
+    // Make a request to the server and add JSON data "numOfReadings"
+    const response = await fetch(`${this.rootUrl}/get-bulk-air-temperature-humidity`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        numOfReadings: numOfReadings,
+      }),
+    });
+
+    // Get the response data
+    const data = await response.json();
+
+    // Get the JSON data
+    const jsonData = JSON.parse(data);
+
+    // Get "message" from the JSON data
+    const message = jsonData["message"];
+
+    // Get air-temperature-list, air-humidity-list and timestamp-list from the message    
+    const airTemperatureList = message["air-temperature-list"];
+    const airHumidityList = message["air-humidity-list"];
+    const timestampList = message["timestamp-list"];
+
+    // Print the data
+    console.log("## Bulk air temperature and humidity ##");
+    console.log(`Air temperature list: ${airTemperatureList}`);
+    console.log(`Air humidity list: ${airHumidityList}`);
+    console.log(`Timestamp list: ${timestampList}`);
+
+    // Return the data
+    return [airTemperatureList, airHumidityList, timestampList];
+  }
+
+  async getSoilMoisture() {
+    // Make a request to the server
+    const response = await fetch(`${this.rootUrl}/get-soil-moisture`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Get the response data
+    const data = await response.json();
+
+    // Get the JSON data
+    const jsonData = JSON.parse(data);
+
+    // Get "message" from the JSON data
+    const message = jsonData["message"];
+
+    // Get soil-moisture and timestamp from the message
+    const soilMoisture = message["soil-moisture"];
+    const timestamp = message["timestamp"];
+
+    // Print the data
+    console.log("## Soil moisture ##");
+    console.log(`Soil moisture: ${soilMoisture}`);
+    console.log(`Timestamp: ${timestamp}`);
+
+    // Return the data
+    return [soilMoisture, timestamp];
+  }
+
+  async getBulkSoilMoisture(numOfReadings: number) {
+    // Make a request to the server and add JSON data "numOfReadings"
+    const response = await fetch(`${this.rootUrl}/get-bulk-soil-moisture`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        numOfReadings: numOfReadings,
+      }),
+    });
+    
+    // Get the response data
+    const data = await response.json();
+
+    // Get the JSON data
+    const jsonData = JSON.parse(data);
+
+    // Get "message" from the JSON data
+    const message = jsonData["message"];
+
+    // Get soil-moisture-list and timestamp-list from the message
+    const soilMoistureList = message["soil-moisture-list"];
+    const timestampList = message["timestamp-list"];
+
+    // Print the data
+    console.log("## Bulk soil moisture ##");
+    console.log(`Soil moisture list: ${soilMoistureList}`);
+    console.log(`Timestamp list: ${timestampList}`);
+
+    // Return the data
+    return [soilMoistureList, timestampList];
+  }
+
+  async setRelayStateON() {
+    // Make a request to the server
+    const response = await fetch(`${this.rootUrl}/set-relay-state-ON`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Get the response data
+    const data = await response.json();
+
+    // Get the JSON data
+    const jsonData = JSON.parse(data);
+
+    // Get "message" from the JSON data
+    const message = jsonData["message"];
+
+    // Get relay-state from the message
+    const relayState = message["relay-state"];
+
+    // Print the data
+    console.log("## Relay state ##");
+    console.log(`Relay state: ${relayState}`);
+
+    // Return the data
+    return relayState;
+  }
+
+  async setRelayStateOFF() {
+    // Make a request to the server
+    const response = await fetch(`${this.rootUrl}/set-relay-state-OFF`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Get the response data
+    const data = await response.json();
+
+    // Get the JSON data
+    const jsonData = JSON.parse(data);
+
+    // Get "message" from the JSON data
+    const message = jsonData["message"];
+
+    // Get relay-state from the message
+    const relayState = message["relay-state"];
+
+    // Print the data
+    console.log("## Relay state ##");
+    console.log(`Relay state: ${relayState}`);
+
+    // Return the data
+    return relayState;
+  }
+
 }
-
-
 
 
 // Create instances of used classes
 const apiRequestClassInstance = new apiRequestClass();
 const automaticWateringClassInstance = new automaticWateringClass();
-*/
+
+// Call the methods from apiRequestClassInstance
+apiRequestClassInstance.getAirTemperatureHumidity();
+apiRequestClassInstance.getBulkAirTemperatureHumidity(10);
+apiRequestClassInstance.getSoilMoisture();
+apiRequestClassInstance.getBulkSoilMoisture(10);
+apiRequestClassInstance.setRelayStateON();
+apiRequestClassInstance.setRelayStateOFF();
 
 
 // Webpage component
@@ -83,13 +288,14 @@ const DashboardPage: React.FC = () => {
             
             <Box title="AIR TEMPERATURE AND HUMIDITY">
               <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-                Air temperature: 0°C
+                
               </div>  
             </Box>
             
             <Box title="SOIL MOISTURE">
               <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-                Soil moisture: 0%
+                
+
               </div>
             </Box>
             

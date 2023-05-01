@@ -271,19 +271,11 @@ func getAirTemperatureHumidityRouteHandler(db *gorm.DB, RPI_API_CONNECTION_STRIN
 			log.Fatalln("!! Read Go-server API response error: ", err)
 		}
 
-		// Print the response body
-		log.Println("## Go-server API response body: ##")
-		log.Println(string(body))
-
 		// Unmarshal the message response body into a struct
 		var resp AirTemperatureHumidityResponse
 		if err := json.Unmarshal(body, &resp); err != nil {
 			log.Fatalln("!! Unmarshal Go-server API response error: ", err)
 		}
-
-		// Print struct
-		log.Println("## Go-server API response struct: ##")
-		log.Println(resp)
 
 		// Access the values in the struct
 		log.Println("## Temperature:", resp.Message.Temperature, " ##")

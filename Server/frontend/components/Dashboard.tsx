@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import Chart from 'chart.js/auto';
 import styles from '../styles/Dashboard.module.css';
 
 
@@ -99,5 +100,7 @@ const ButtonWater: React.FC<ButtonProps> = ({ children, onClick }) => {
     </button>
   );
 };
+
+
 
 export {Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater};
