@@ -426,7 +426,7 @@ const DashboardPage: React.FC = () => {
                     <thead>
                       <tr>
                         <th className="px-4 py-2">Air Temperature</th>
-                        <th className="px-4 py-2">Timestamp</th>
+                        <th className="px-4 py-2 w-3/5">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
@@ -438,7 +438,7 @@ const DashboardPage: React.FC = () => {
                     <thead>
                       <tr>
                         <th className="px-4 py-2">Air humidity</th>
-                        <th className="px-4 py-2">Timestamp</th>
+                        <th className="px-4 py-2 w-3/5">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
@@ -450,7 +450,7 @@ const DashboardPage: React.FC = () => {
                     <thead>
                       <tr>
                         <th className="px-4 py-2">Soil moisture</th>
-                        <th className="px-4 py-2">Timestamp</th>
+                        <th className="px-4 py-2 w-3/5">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
@@ -462,7 +462,7 @@ const DashboardPage: React.FC = () => {
                     <thead>
                       <tr>
                         <th className="px-4 py-2">Watering</th>
-                        <th className="px-4 py-2">Timestamp</th>
+                        <th className="px-4 py-2 w-3/5">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody></tbody>

@@ -106,7 +106,6 @@ interface ThresholdSliderProps {
   value: number;
   onChange: (event: Event, value: number | number[]) => void;
 }
-
 const ThresholdSlider: React.FC<ThresholdSliderProps> = ({ value, onChange }) => {
   return (
     <div className={styles.slider_container}>
