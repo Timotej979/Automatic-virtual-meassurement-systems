@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
-import Chart from 'chart.js/auto';
+import * as React from 'react';
+import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import { jsx } from '@emotion/react';
+import Chart from 'chart.js/auto';
 import styles from '../styles/Dashboard.module.css';
 
 
@@ -62,7 +63,7 @@ interface BoxProps {
   children: ReactNode;
   title: string;
 }
-const Box: React.FC<BoxProps> = ({ title, children}) => {
+const BoundaryBox: React.FC<BoxProps> = ({ title, children}) => {
   return (
     <div className={styles.box_container}>
       <h2 className={styles.box_title}>{title}</h2>
@@ -101,25 +102,49 @@ const ButtonWater: React.FC<ButtonProps> = ({ children, onClick }) => {
   );
 };
 
-// Slider component
-interface ThresholdSliderProps {
-  value: number;
-  onChange: (event: Event, value: number | number[]) => void;
+// Slider threshold component
+function valuetextThreshold(value: number) {
+  return `${value}%`;
 }
-const ThresholdSlider: React.FC<ThresholdSliderProps> = ({ value, onChange }) => {
+function ThresholdDiscreteSlider() {
   return (
-    <div className={styles.slider_container}>
-      <Slider
-        value={value}
-        onChange={onChange}
+    <Box sx={{ width: 300, display: 'flex', justifyContent: 'center' }}>
+      <Slider sx={{ color: "#32cd32"}}
         aria-label="Soil moisture threshold"
+        defaultValue={30}
+        getAriaValueText={valuetextThreshold}
         valueLabelDisplay="auto"
+        step={5}
+        marks
         min={0}
         max={100}
+        title="Soil moisture threshold"
       />
-    </div>
+    </Box>
   );
-};
+}
+
+// Slider watering component
+function valuetextWatering(value: number) {
+  return `${value}s`;
+}
+function WateringDiscreteSlider() {
+  return (
+    <Box sx={{ width: 300, display: 'flex', justifyContent: 'center' }}>
+      <Slider sx={{ color: "#87ceeb" }}
+        aria-label="Watering time"
+        defaultValue={30}
+        getAriaValueText={valuetextWatering}
+        valueLabelDisplay="auto"
+        step={2}
+        marks
+        min={0}
+        max={40}
+        title="Watering time"
+      />
+    </Box>
+  );
+}
 
 
-export {Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater, ThresholdSlider};
+export {Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider};

@@ -1,5 +1,7 @@
 import { Inter } from 'next/font/google'
-import { Dashboard, FirstPart, SecondPart, ThirdPart, Box, ButtonSensor, ButtonAuto, ButtonWater, ThresholdSlider } from '@/components/Dashboard'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider } from '@/components/Dashboard'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -299,8 +301,63 @@ class apiRequestClass {
   }
 } 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// Manual sensor class
+class manualSensorClass {
+  // Api request class instance
+  apiRequestClassInstance: apiRequestClass;
+  // Number of sensor values to get
+  numOfValues: number
+  // Constructor
+  constructor() {
+    // Create an instance of the api request class
+    this.apiRequestClassInstance = new apiRequestClass();
+    this.numOfValues = 3;
+  }
 
+  // Start get numOfValues times air temperature and humidity values function
+  async manualGetAirTemperatureHumidityValues() {
+    console.log("## Manual get air temperature and humidity values started ##");
+    // Get the sensor values
+    await this.apiRequestClassInstance.getBulkAirTemperatureHumidity(this.numOfValues);
+    console.log("## Manual get air temperature and humidity values stopped ##");
+  }
 
+  // Start get numOfValues times soil moisture values function
+  async manualGetSoilMoistureValues() {
+    console.log("## Manual get soil moisture values started ##");
+    // Get the sensor values
+    await this.apiRequestClassInstance.getBulkSoilMoisture(this.numOfValues);
+    console.log("## Manual get soil moisture values stopped ##");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Manula watering class
+class manualWateringClass {
+  // Api request class instance
+  apiRequestClassInstance: apiRequestClass;
+  // Constructor
+  constructor() {
+    // Create an instance of the api request class
+    this.apiRequestClassInstance = new apiRequestClass();
+
+  }
+
+  // Start manual watering function
+  async manualWatering(time: number) {
+    console.log("## Manual watering started ##");
+    // Set the relay state to ON
+    this.apiRequestClassInstance.setRelayStateON();
+    // Wait for the specified time
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), time));
+    // Set the relay state to OFF
+    this.apiRequestClassInstance.setRelayStateOFF();
+    console.log("## Manual watering stopped ##");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // Automatic watering class
 class automaticWateringClass {
   // Kill switch
@@ -375,8 +432,12 @@ class automaticWateringClass {
 }
 
 // Create automatic watering class instance
+const manualSensorClassInstance = new manualSensorClass;
+const manualWateringClassInstance = new manualWateringClass;
 const automaticWateringClassInstance = new automaticWateringClass;
+// Request class should be deleted on production
 const apiRequestClassInstance = new apiRequestClass;
+
 
 // Make 10 requests for the air temperature and humidity
 apiRequestClassInstance.getBulkAirTemperatureHumidity(10);
@@ -403,23 +464,23 @@ const DashboardPage: React.FC = () => {
 
           <FirstPart >
             
-            <Box title="AIR TEMPERATURE AND HUMIDITY">
+            <BoundaryBox title="AIR TEMPERATURE AND HUMIDITY">
               <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
                 
               </div>  
-            </Box>
+            </BoundaryBox>
             
-            <Box title="SOIL MOISTURE">
+            <BoundaryBox title="SOIL MOISTURE">
               <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
                 
 
               </div>
-            </Box>
+            </BoundaryBox>
             
           </FirstPart>
 
           <SecondPart>
-            <Box title="LATEST MEASUREMENTS">
+            <BoundaryBox title="LATEST MEASUREMENTS">
               <div className="flex flex-col gap-4 h-full">
                 <div className="flex-grow lg:flex-basis-25">
                   <table id="airTemperatureTable" className="table-auto w-full">
@@ -469,35 +530,48 @@ const DashboardPage: React.FC = () => {
                   </table>
                 </div>
               </div>
-            </Box>
+            </BoundaryBox>
           </SecondPart>
           
           <ThirdPart>
-            <Box title="CONTROL PANEL">
-              <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-                <ButtonSensor onClick={() => console.log("READ AIR TEMPERATURE AND HUMIDITY")}>
-                  READ AIR TEMPERATURE AND HUMIDITY
-                </ButtonSensor>
-
-                <ButtonSensor onClick={() => console.log("READ SOIL MOISTURE")}>
-                  READ SOIL MOISTURE
-                </ButtonSensor>
-
-                <ButtonAuto onClick={() => console.log("START AUTOMATIC WATERING")}>
-                  START AUTOMATIC WATERING
-                </ButtonAuto>
-
-                <ButtonAuto onClick={() => console.log("STOP AUTOMATIC WATERING")}>
-                  STOP AUTOMATIC WATERING
-                </ButtonAuto>
+            <BoundaryBox title="CONTROL PANEL">
+              <div className="mb-32 grid lg:mb-0 lg:grid-cols-4">
+                <div className="flex flex-col justify-center items-center">
+                  <ButtonSensor onClick={() => manualSensorClassInstance.manualGetAirTemperatureHumidityValues()}>
+                    READ AIR TEMPERATURE AND HUMIDITY
+                  </ButtonSensor>
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <ButtonSensor onClick={() => manualSensorClassInstance.manualGetSoilMoistureValues()}>
+                    READ SOIL MOISTURE
+                  </ButtonSensor>
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <WateringDiscreteSlider/>
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <ButtonWater onClick={() => console.log("WATER THE PLANT")}>
+                    WATER THE PLANT
+                  </ButtonWater>
+                </div>
               </div>
 
-              <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-                <ButtonWater onClick={() => console.log("WATER THE PLANT")}>
-                  WATER THE PLANT
-                </ButtonWater>
+              <div className="mb-32 grid lg:mb-0 lg:grid-cols-4">
+                <div className="flex flex-col justify-center items-center">
+                  <ButtonAuto onClick={() => console.log("START AUTOMATIC WATERING")}>
+                    START AUTOMATIC WATERING
+                  </ButtonAuto>
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <ButtonAuto onClick={() => console.log("STOP AUTOMATIC WATERING")}>
+                    STOP AUTOMATIC WATERING
+                  </ButtonAuto>
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <ThresholdDiscreteSlider/>                
+                </div>
               </div>
-            </Box>
+            </BoundaryBox>
           </ThirdPart>
           {}
         </Dashboard>

@@ -28,12 +28,16 @@
 .second_part {
   flex: 0 0 20%; /* sets the flex basis to 20% and disables growth and shrinking */
   height: 70%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Set the third part */
 .third_part {
+  flex: 0 0 100%; /* sets the flex basis to 100% and disables growth and shrinking */
   height: 30%;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -125,6 +129,18 @@
   text-decoration: none;
 }
 
+/* Slider styling */
+.slider_container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+/* Chart styling */
 .chart_container {
   margin: 10px;
   padding: 10px;
