@@ -19,7 +19,7 @@
 /* Set the first part */
 .first_part {
   flex: 0 0 80%; /* sets the flex basis to 80% and disables growth and shrinking */
-  height: 70%;
+  height: 75%;
   display: flex;
   flex-direction: column;
 }
@@ -27,7 +27,7 @@
 /* Set the second part */
 .second_part {
   flex: 0 0 20%; /* sets the flex basis to 20% and disables growth and shrinking */
-  height: 70%;
+  height: 75%;
   display: flex;
   flex-direction: column;
 }
@@ -35,7 +35,7 @@
 /* Set the third part */
 .third_part {
   flex: 0 0 100%; /* sets the flex basis to 100% and disables growth and shrinking */
-  height: 30%;
+  height: 25%;
   display: flex;
   flex-direction: column;
   position: absolute;

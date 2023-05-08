@@ -1,7 +1,8 @@
 import { Inter } from 'next/font/google'
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider } from '@/components/Dashboard'
+import { Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider, RTOneLineGraph } from '@/components/Dashboard'
+import { parseArgs } from 'util';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -302,6 +303,29 @@ class apiRequestClass {
 } 
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// Page initialization class
+class pageInitializationClass {
+  // Api request class instance
+  apiRequestClassInstance: apiRequestClass;
+  // Constructor
+  constructor() {
+    // Create an instance of the api request class
+    this.apiRequestClassInstance = new apiRequestClass();
+  }
+
+  async initializePage() {
+    // Get the air temperature and humidity values
+    //[temperatureList, humidityList, timestamps] = await this.apiRequestClassInstance.getBulkAirTemperatureHumidity(10);
+    // Get the soil moisture values
+    await this.apiRequestClassInstance.getBulkSoilMoisture(10);
+   
+    
+
+  }
+
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // Manual sensor class
 class manualSensorClass {
   // Api request class instance
@@ -312,7 +336,7 @@ class manualSensorClass {
   constructor() {
     // Create an instance of the api request class
     this.apiRequestClassInstance = new apiRequestClass();
-    this.numOfValues = 3;
+    this.numOfValues = 4;
   }
 
   // Start get numOfValues times air temperature and humidity values function
@@ -341,7 +365,6 @@ class manualWateringClass {
   constructor() {
     // Create an instance of the api request class
     this.apiRequestClassInstance = new apiRequestClass();
-
   }
 
   // Start manual watering function
@@ -349,8 +372,8 @@ class manualWateringClass {
     console.log("## Manual watering started ##");
     // Set the relay state to ON
     this.apiRequestClassInstance.setRelayStateON();
-    // Wait for the specified time
-    await new Promise<void>((resolve) => setTimeout(() => resolve(), time));
+    // Wait for the specified time in seconds (*1000 to convert to milliseconds)
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), time*1000));
     // Set the relay state to OFF
     this.apiRequestClassInstance.setRelayStateOFF();
     console.log("## Manual watering stopped ##");
@@ -374,14 +397,10 @@ class automaticWateringClass {
   }
 
   // Start automatic watering
-  async startAutomaticWatering() {
+  async startAutomaticWatering(threshold: number) {
     console.log("## Automatic watering started ##");
     // Set the kill switch to false
     this.killSwitch = false;
-
-    // Get the threshold
-    const threshold = 50//document.getElementById("threshold")!.value;
-
     // Start automatic watering
     this.automaticWatering(threshold);
   }
@@ -431,6 +450,7 @@ class automaticWateringClass {
   }
 }
 
+
 // Create automatic watering class instance
 const manualSensorClassInstance = new manualSensorClass;
 const manualWateringClassInstance = new manualWateringClass;
@@ -454,6 +474,7 @@ apiRequestClassInstance.setRelayStateON();
 apiRequestClassInstance.setRelayStateOFF();
 apiRequestClassInstance.setRelayStateON();
 apiRequestClassInstance.setRelayStateOFF();
+
 
 
 // Webpage component
@@ -546,11 +567,16 @@ const DashboardPage: React.FC = () => {
                     READ SOIL MOISTURE
                   </ButtonSensor>
                 </div>
-                <div className="flex flex-col justify-center items-center">
+                <div id="WaterSlider" className="flex flex-col justify-center items-center">
                   <WateringDiscreteSlider/>
                 </div>
                 <div className="flex flex-col justify-center items-center">
-                  <ButtonWater onClick={() => console.log("WATER THE PLANT")}>
+                  <ButtonWater onClick={() => { const waterSliderText = document.getElementById("WaterSlider")?.innerText;
+                                                if (waterSliderText !== undefined) {
+                                                  const waterSliderValue = parseInt(waterSliderText);
+                                                  manualWateringClassInstance.manualWatering(waterSliderValue);
+                                                }
+                                              }}>
                     WATER THE PLANT
                   </ButtonWater>
                 </div>
@@ -558,16 +584,21 @@ const DashboardPage: React.FC = () => {
 
               <div className="mb-32 grid lg:mb-0 lg:grid-cols-4">
                 <div className="flex flex-col justify-center items-center">
-                  <ButtonAuto onClick={() => console.log("START AUTOMATIC WATERING")}>
+                  <ButtonAuto onClick={() => { const thresholdSliderText = document.getElementById("ThresholdSlider")?.innerText;
+                                                if (thresholdSliderText !== undefined) {
+                                                  const thresholdSliderValue = parseInt(thresholdSliderText);
+                                                  automaticWateringClassInstance.startAutomaticWatering(thresholdSliderValue);
+                                                }
+                                             }}>
                     START AUTOMATIC WATERING
                   </ButtonAuto>
                 </div>
                 <div className="flex flex-col justify-center items-center">
-                  <ButtonAuto onClick={() => console.log("STOP AUTOMATIC WATERING")}>
+                  <ButtonAuto onClick={() => automaticWateringClassInstance.stopAutomaticWatering()}>
                     STOP AUTOMATIC WATERING
                   </ButtonAuto>
                 </div>
-                <div className="flex flex-col justify-center items-center">
+                <div id="ThresholdSlider" className="flex flex-col justify-center items-center">
                   <ThresholdDiscreteSlider/>                
                 </div>
               </div>
