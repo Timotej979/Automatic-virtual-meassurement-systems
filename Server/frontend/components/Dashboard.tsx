@@ -1,9 +1,7 @@
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode } from 'react';
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-
 import styles from '../styles/Dashboard.module.css';
 
 
@@ -21,7 +19,7 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
     </main>
   );
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // First part component
 interface FirstPartProps {
   children: React.ReactNode;
@@ -33,7 +31,7 @@ const FirstPart: React.FC<FirstPartProps> = ({ children }) => {
     </div>
   );
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Second part component
 interface SecondPartProps {
   children: React.ReactNode;
@@ -45,8 +43,7 @@ const SecondPart: React.FC<SecondPartProps> = ({ children }) => {
     </div>
   );
 };
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Third part component
 interface ThirdPartProps {
   children: React.ReactNode;
@@ -58,7 +55,7 @@ const ThirdPart: React.FC<ThirdPartProps> = ({ children }) => {
     </div>
   );
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Box component
 interface BoxProps {
   children: ReactNode;
@@ -75,7 +72,7 @@ const BoundaryBox: React.FC<BoxProps> = ({ title, children}) => {
     </div>
   );
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Button components
 interface ButtonProps {
   children: ReactNode;
@@ -102,7 +99,7 @@ const ButtonWater: React.FC<ButtonProps> = ({ children, onClick }) => {
     </button>
   );
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Slider threshold component
 function valuetextThreshold(value: number) {
   return `${value}%`;
@@ -124,7 +121,7 @@ function ThresholdDiscreteSlider() {
     </Box>
   );
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Slider watering component
 function valuetextWatering(value: number) {
   return `${value}s`;
@@ -146,57 +143,5 @@ function WateringDiscreteSlider() {
     </Box>
   );
 }
-
-// RT graph components
-interface OneLineGraphProps {
-  data: { timestamp: string; [key: string]: number | string }[];
-  lineColor?: string;
-  lineName?: string;
-  chartName?: string;
-}
-
-const RTOneLineGraph: React.FC<OneLineGraphProps> = ({
-  data,
-  lineColor = '#8884d8',
-  lineName = 'Value',
-  chartName = 'Realtime Graph',
-}) => {
-  const [chartData, setChartData] = useState(data);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Fetch new data and update chartData state
-      setChartData((prevData) => {
-        const newDataPoint = { timestamp: new Date().toISOString(), value: Math.random() };
-        const newChartData = [...prevData, newDataPoint].slice(-30); // Show only last 30 points
-        return newChartData;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={chartData}>
-        <XAxis dataKey="timestamp" type="category" interval={4} />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey={lineName}
-          stroke={lineColor}
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-};
-
-
-
-
-export {Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider, RTOneLineGraph};
+// Export components
+export {Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider};
