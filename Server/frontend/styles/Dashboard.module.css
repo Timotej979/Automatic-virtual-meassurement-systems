@@ -18,21 +18,21 @@
 /* Set the first part */
 .first_part {
   flex: 0 0 80%; /* sets the flex basis to 80% and disables growth and shrinking */
-  height: 75%;
+  height: 77%;
   display: flex;
   flex-direction: column;
 }
 /* Set the second part */
 .second_part {
   flex: 0 0 20%; /* sets the flex basis to 20% and disables growth and shrinking */
-  height: 75%;
+  height: 77%;
   display: flex;
   flex-direction: column;
 }
 /* Set the third part */
 .third_part {
   flex: 0 0 100%; /* sets the flex basis to 100% and disables growth and shrinking */
-  height: 25%;
+  height: 23%;
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -45,20 +45,26 @@
   flex-direction: column;
   justify-content: center;
   align-items: left;
-  margin: 10px;
-  padding: 10px;
-  background: #808080;
-  border-radius: 2rem;
+  margin: 5px;
+  padding: 20x;
+  padding-bottom: 10px;
+  background: #424242;
+  border-radius: 1rem;
   border-color: #d3d3d3;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   opacity: 0.8;
+}
+.box_container:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 /* Set the box title */
 .box_title {
+  padding: 10px;
   font-size: 1.5rem;
   font-weight: 900;
   color: #fff;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  margin-left: 0.2rem;
 }
 /* Set different button styles */
 .btn_sensor_grad {
@@ -71,7 +77,6 @@
   transition: 0.5s;
   background-size: 200% auto;
   color: white;            
-  box-shadow: 0 0 20px #eee;
   border-radius: 10px;
   display: block;
 }
@@ -79,6 +84,7 @@
   background-position: right center; /* change the direction of the change here */
   color: #fff;
   text-decoration: none;
+  box-shadow: 0 0 20px #eee;
 }
 
 .btn_auto_grad {
@@ -91,7 +97,6 @@
   transition: 0.5s;
   background-size: 200% auto;
   color: white;            
-  box-shadow: 0 0 20px #eee;
   border-radius: 10px;
   display: block;
 }
@@ -99,6 +104,7 @@
   background-position: right center; /* change the direction of the change here */
   color: #fff;
   text-decoration: none;
+  box-shadow: 0 0 20px #eee;
 }
 
 .btn_water_grad {
@@ -111,7 +117,6 @@
   transition: 0.5s;
   background-size: 200% auto;
   color: white;            
-  box-shadow: 0 0 20px #eee;
   border-radius: 10px;
   display: block;
 }
@@ -119,6 +124,7 @@
   background-position: right center; /* change the direction of the change here */
   color: #fff;
   text-decoration: none;
+  box-shadow: 0 0 20px #eee;
 }
 /* Slider styling */
 .slider_container {

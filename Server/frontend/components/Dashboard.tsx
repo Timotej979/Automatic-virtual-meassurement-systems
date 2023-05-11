@@ -66,7 +66,7 @@ const BoundaryBox: React.FC<BoxProps> = ({ title, children}) => {
   return (
     <div className={styles.box_container}>
       <h2 className={styles.box_title}>{title}</h2>
-      <div>
+      <div style={{ height: '100%' }}>
         {/* Add your box content here */}
         {children}
       </div>
