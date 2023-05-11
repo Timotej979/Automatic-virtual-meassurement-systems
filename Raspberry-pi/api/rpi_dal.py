@@ -187,7 +187,7 @@ class RPI_dal():
             timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
             # Remap soil moisture value
-            soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
+            soil_moisture = 100 - self.remap_range(soil_moisture, 0, 65535, 0, 100)
 
             # Log timestamp and soil moisture
             self.logger.info("## Timestamp: " + str(timestamp) + " ##")
@@ -223,7 +223,7 @@ class RPI_dal():
                     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
                     # Remap soil moisture value
-                    soil_moisture = self.remap_range(soil_moisture, 0, 65535, 0, 100)
+                    soil_moisture = 100 - self.remap_range(soil_moisture, 0, 65535, 0, 100)
 
                     # Append to lists
                     timestamp_list.append(timestamp)
