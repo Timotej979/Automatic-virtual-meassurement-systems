@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import React, { Component } from 'react';
-import { Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider } from '@/components/Dashboard'
+import { Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider, AxisLabel } from '@/components/Dashboard'
 
 // Graph imports
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
@@ -32,7 +32,7 @@ const DashboardPage: React.FC = () => {
         newCell1.style.textAlign = "center";
         newCell2.style.textAlign = "center";
         // Add the data to the cell and reformat the timestamp
-        newCell1.innerHTML = temperature.toString();
+        newCell1.innerHTML = temperature.toString() + "°C";
         timestamp = timestamp.replace("T", " ");
         timestamp = timestamp.replace("Z", "");
         newCell2.innerHTML = timestamp;
@@ -53,7 +53,7 @@ const DashboardPage: React.FC = () => {
         newCell1.style.textAlign = "center";
         newCell2.style.textAlign = "center";
         // Add the data to the cell and reformat the timestamp
-        newCell1.innerHTML = humidity.toString();
+        newCell1.innerHTML = humidity.toString() + "%";
         timestamp = timestamp.replace("T", " ");
         timestamp = timestamp.replace("Z", "");
         newCell2.innerHTML = timestamp;
@@ -74,7 +74,7 @@ const DashboardPage: React.FC = () => {
         newCell1.style.textAlign = "center";
         newCell2.style.textAlign = "center";
         // Add the data to the cell and reformat the timestamp
-        newCell1.innerHTML = moisture.toString();
+        newCell1.innerHTML = moisture.toString() + "%";
         timestamp = timestamp.replace("T", " ");
         timestamp = timestamp.replace("Z", "");
         newCell2.innerHTML = timestamp;
@@ -406,7 +406,6 @@ const DashboardPage: React.FC = () => {
             const [datePart, timePart] = timestampArray[i].split('T');
             chartData.push({ soilMoisture: soilMoistureArray[i], date: timePart.replace("Z", "") });
           }
-          console.log(chartData);
           // Set the state
           this.setState({ chartData });
         };
@@ -417,14 +416,14 @@ const DashboardPage: React.FC = () => {
         render() {
           const { chartData } = this.state;
           return (
-            <LineChart width={1350} height={265} data={chartData} margin={{left: 30, bottom: 30}}>
+            <LineChart width={1400} height={270} data={chartData} margin={{left: 25, bottom: 30}}>
               <Line type="monotone" dataKey="soilMoisture" stroke="#32cd32" strokeWidth={5} />
               <CartesianGrid stroke="#fff" strokeWidth={2} strokeDasharray="5 5" />
               <XAxis dataKey="date"
                      label={{ value: "Timestamp [hh:mm:ss]", position: "insideBottom", offset: -20, fontSize: 18, fill: "#fff" }}
                      stroke="#fff"
                      strokeWidth={3}/>
-              <YAxis label={{ value: "Soil Moisture [%]", angle: -90, position: "insideCenter", offset: -200, fontSize: 18, fill: "#fff" }} 
+              <YAxis label={<AxisLabel axisType="yAxis" x={45} y={105} width={0} height={0} fill='#fff'>Soil moisture [%]</AxisLabel>} 
                      stroke="#fff"
                      strokeWidth={3}
                      min={0}
@@ -472,7 +471,6 @@ const DashboardPage: React.FC = () => {
             const [datePart, timePart] = timestampArray[i].split('T');
             chartData.push({ airTemperature: airTemperatureArray[i], airHumidity: airHumidityArray[i], date: timePart.replace("Z", "") });
           }
-          console.log(chartData);
           // Set the state
           this.setState({ chartData });
         };
@@ -483,7 +481,7 @@ const DashboardPage: React.FC = () => {
       render() {
         const { chartData } = this.state;
         return (
-          <LineChart width={1350} height={265} data={chartData} margin={{left: 30, bottom: 30}}>
+          <LineChart width={1400} height={270} data={chartData} margin={{left: 25, bottom: 30}}>
             <Line type="monotone" dataKey="airTemperature" stroke="#ff0" strokeWidth={5} />
             <Line type="monotone" dataKey="airHumidity" stroke="#87ceeb" strokeWidth={5} />
             <CartesianGrid stroke="#fff" strokeWidth={2} strokeDasharray="5 5" />
@@ -491,7 +489,7 @@ const DashboardPage: React.FC = () => {
                     label={{ value: "Timestamp [hh:mm:ss]", position: "insideBottom", offset: -20, fontSize: 18, fill: "#fff" }}
                     stroke="#fff"
                     strokeWidth={3}/>
-            <YAxis label={{ value: "Air Temperature [°C]\nAir Humidity [%]", angle: -90, position: "insideCenter", offset: -300, fontSize: 18, fill: "#fff" }}
+            <YAxis label={<AxisLabel axisType="yAxis" x={25} y={105} width={0} height={0} fill='#fff'>Air Temperature [°C]{'\n'}Air Humidity [%]</AxisLabel>}
                     stroke="#fff"
                     strokeWidth={3}
                     min={0}
@@ -524,6 +522,11 @@ const DashboardPage: React.FC = () => {
     const manualSensorClassInstance = new manualSensorClass;
     const manualWateringClassInstance = new manualWateringClass;
     const automaticWateringClassInstance = new automaticWateringClass;
+    // Create api request class instance and initialize the relay state
+    const apiRequestClassInstance = new apiRequestClass;
+    for(let i = 0; i < 4; i++) {
+      apiRequestClassInstance.setRelayStateOFF();
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Return the webpage
     return (
@@ -594,12 +597,12 @@ const DashboardPage: React.FC = () => {
           <ThirdPart>
             <BoundaryBox title="CONTROL PANEL">
               <div className="mb-32 grid lg:mb-0 lg:grid-cols-4">
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-left">
                   <ButtonSensor onClick={() => manualSensorClassInstance.manualGetAirTemperatureHumidityValues()}>
                     READ AIR TEMPERATURE AND HUMIDITY
                   </ButtonSensor>
                 </div>
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-left">
                   <ButtonSensor onClick={() => manualSensorClassInstance.manualGetSoilMoistureValues()}>
                     READ SOIL MOISTURE
                   </ButtonSensor>
@@ -607,7 +610,7 @@ const DashboardPage: React.FC = () => {
                 <div id="WaterSlider" className="flex flex-col justify-center items-center">
                   <WateringDiscreteSlider/>
                 </div>
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-left">
                   <ButtonWater onClick={() => { const waterSliderText = document.getElementById("WaterSlider")?.innerText;
                                                 if (waterSliderText !== undefined) {
                                                   const waterSliderValue = parseInt(waterSliderText);
@@ -619,7 +622,7 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
               <div className="mb-32 grid lg:mb-0 lg:grid-cols-4">
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-left">
                   <ButtonAuto onClick={() => { const thresholdSliderText = document.getElementById("ThresholdSlider")?.innerText;
                                                 if (thresholdSliderText !== undefined) {
                                                   const thresholdSliderValue = parseInt(thresholdSliderText);
@@ -629,7 +632,7 @@ const DashboardPage: React.FC = () => {
                     START AUTOMATIC WATERING
                   </ButtonAuto>
                 </div>
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-left">
                   <ButtonAuto onClick={() => automaticWateringClassInstance.stopAutomaticWatering()}>
                     STOP AUTOMATIC WATERING
                   </ButtonAuto>
@@ -645,5 +648,6 @@ const DashboardPage: React.FC = () => {
       </main>
     );
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Export the page
 export default DashboardPage;

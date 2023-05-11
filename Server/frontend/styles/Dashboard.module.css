@@ -6,16 +6,15 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-image: linear-gradient(-165deg,#ff0,transparent 30%),
+  background-image: linear-gradient(165deg, lightgray, transparent 30%),
+                    linear-gradient(-165deg,#ff0,transparent 30%),
                     linear-gradient(180deg,#87ceeb 50%,#32cd32 52%,#8b4513 70%);
 }
-
 /* Split the webpage into 3 parts inside container */
 .container {
   display: flex;
   height: 100%;
 }
-
 /* Set the first part */
 .first_part {
   flex: 0 0 80%; /* sets the flex basis to 80% and disables growth and shrinking */
@@ -23,7 +22,6 @@
   display: flex;
   flex-direction: column;
 }
-
 /* Set the second part */
 .second_part {
   flex: 0 0 20%; /* sets the flex basis to 20% and disables growth and shrinking */
@@ -31,7 +29,6 @@
   display: flex;
   flex-direction: column;
 }
-
 /* Set the third part */
 .third_part {
   flex: 0 0 100%; /* sets the flex basis to 100% and disables growth and shrinking */
@@ -42,7 +39,6 @@
   bottom: 0;
   left: 0;
 }
-
 /* Separate boxes inside the parts */
 .box_container {
   display: flex;
@@ -55,8 +51,8 @@
   border-radius: 0.5rem;
   border-color: #d3d3d3;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0.8;
 }
-
 /* Set the box title */
 .box_title {
   font-size: 1.5rem;
@@ -64,7 +60,6 @@
   color: #fff;
   margin-bottom: 1rem;
 }
-
 /* Set different button styles */
 .btn_sensor_grad {
   background-image: linear-gradient(to right, #8b4513 0%, #32cd32  51%, #8b4513  100%);
@@ -80,7 +75,6 @@
   border-radius: 10px;
   display: block;
 }
-
 .btn_sensor_grad:hover {
   background-position: right center; /* change the direction of the change here */
   color: #fff;
@@ -101,7 +95,6 @@
   border-radius: 10px;
   display: block;
 }
-
 .btn_auto_grad:hover {
   background-position: right center; /* change the direction of the change here */
   color: #fff;
@@ -122,13 +115,11 @@
   border-radius: 10px;
   display: block;
 }
-
 .btn_water_grad:hover {
   background-position: right center; /* change the direction of the change here */
   color: #fff;
   text-decoration: none;
 }
-
 /* Slider styling */
 .slider_container {
   width: 100%;
@@ -138,14 +129,4 @@
   align-items: center;
   justify-content: center;
   pointer-events: auto;
-}
-
-/* Chart styling */
-.chart_container {
-  margin: 10px;
-  padding: 10px;
-  background: gray;
-  border-radius: 0.5rem;
-  border-color: lightgray;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

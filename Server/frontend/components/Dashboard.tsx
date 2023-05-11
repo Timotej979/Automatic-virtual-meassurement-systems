@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import styles from '../styles/Dashboard.module.css';
@@ -143,5 +144,37 @@ function WateringDiscreteSlider() {
     </Box>
   );
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Graph Label positioning component
+type AxisLabelProps = {
+  axisType: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  children: React.ReactNode;
+}
+const AxisLabel = ({ axisType, x, y, width, height, fill, children }: AxisLabelProps) => {
+  // Calculate position of label
+  const isVert = axisType === 'yAxis';
+  const cx = isVert ? x : x + (width / 2);
+  const cy = isVert ? (height / 2) + y : y + height + 10;
+  const rot = isVert ? `270 ${cx} ${cy}` : 0;
+
+  // Split label in two lines if possible
+  const words = (children || '').toString().split('\n');
+  // Remove commas from words if there are any
+  for (let i = 0; i < words.length; i++) {
+    words[i] = words[i].replace(",", "");
+  }
+  // Return label
+  return (
+    <text x={cx} y={cy} transform={`rotate(${rot})`} textAnchor="middle" fill={fill} fontSize={18}>
+      {words.map((word, i) => <tspan key={i} x={cx} y={cy + (i * 20)}>{word}</tspan>)}
+    </text>
+  );
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Export components
-export {Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider};
+export {Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider, AxisLabel};
