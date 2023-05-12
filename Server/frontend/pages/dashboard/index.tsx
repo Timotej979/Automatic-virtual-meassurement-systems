@@ -713,8 +713,10 @@ const DashboardPage: React.FC = () => {
               </div>
             </BoundaryBox>
           </ThirdPart>
-          <div style={{ position: 'fixed', bottom: 5, right: 15 }}>
-            <Image src="/logo.png" alt="Logo" width={220} height={200} style={{width: 200, borderRadius: 15, opacity: 0.7}} priority/>
+          <div style={{ position: 'fixed', bottom: 5, right: 17 }}>
+            <a href="https://github.com/Timotej979/Automatic-virtual-meassurement-systems" target="_blank" rel="noopener noreferrer">
+              <Image src="/logo.png" alt="Logo" width={213} height={213} style={{borderRadius: 15, opacity: 0.7}} priority/>
+            </a>
           </div>
           {}
         </Dashboard>
