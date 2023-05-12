@@ -1,9 +1,11 @@
+import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { Dashboard, FirstPart, SecondPart, ThirdPart, BoundaryBox, ButtonSensor, ButtonAuto, ButtonWater, ThresholdDiscreteSlider, WateringDiscreteSlider, AxisLabel } from '@/components/Dashboard'
 
 // Graph imports
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,10 +17,14 @@ const DashboardPage: React.FC = () => {
     class updateTables {
         // Number of rows to display
         numOfRows: number;
+        // First update flag
+        firstUpdate: boolean;
         // Constructor
         constructor() {
             // Set the number of rows to display (-1)
             this.numOfRows = 5;
+            // Set the first update flag
+            this.firstUpdate = true;  
         }
         // Update air temperature table
         async updateAirTemperatureTable(temperature: number, timestamp: string) {
@@ -87,6 +93,18 @@ const DashboardPage: React.FC = () => {
         async updateRelayStateTable(relayState: boolean, timestamp: string) {
             // Get RelayStateTable and add a new row
             const relayStateTable = document.getElementById("relayStateTable")! as HTMLTableElement;
+            // If this is the first update, create a final empty row for spacing
+            if(this.firstUpdate == true) {
+                // Create a final empty row for spacing
+                const finalRow = relayStateTable.insertRow(1);
+                const finalCell1 = finalRow.insertCell(0);
+                const finalCell2 = finalRow.insertCell(1);
+                // Add the empty data to the cell
+                finalCell1.innerHTML = "\r";
+                finalCell2.innerHTML = "\r";
+                // Set the first update flag to false
+                this.firstUpdate = false;
+            }
             // Create a new row and cells
             const newRow = relayStateTable.insertRow(1);
             const newCell1 = newRow.insertCell(0);
@@ -106,12 +124,12 @@ const DashboardPage: React.FC = () => {
                 timestamp = timestamp.replace("Z", "");
                 newCell2.innerHTML = timestamp;
             }
-            // Remove the last row if there are more than 10 rows
-            if (relayStateTable.rows.length > this.numOfRows) {
-                relayStateTable.deleteRow(this.numOfRows);
+            // Remove the before last row if there are more than X rows
+            if (relayStateTable.rows.length > (this.numOfRows - 1)) {
+                relayStateTable.deleteRow(this.numOfRows - 1);
             }
         }
-    }
+    } 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // API REQUEST CLASS 
     class apiRequestClass {
@@ -576,7 +594,7 @@ const DashboardPage: React.FC = () => {
     const automaticWateringClassInstance = new automaticWateringClass;
     // Create api request class instance and initialize the relay state to fill the relay state table
     const apiRequestClassInstance = new apiRequestClass;
-    for(let i = 0; i < 6; i++) {
+    for(let i = 0; i < 4; i++) {
         apiRequestClassInstance.setRelayStateOFF();
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -695,6 +713,9 @@ const DashboardPage: React.FC = () => {
               </div>
             </BoundaryBox>
           </ThirdPart>
+          <div style={{ position: 'fixed', bottom: 5, right: 15 }}>
+            <Image src="/logo.png" alt="Logo" width={220} height={200} style={{width: 200, borderRadius: 15, opacity: 0.7}} priority/>
+          </div>
           {}
         </Dashboard>
       </main>
