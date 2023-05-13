@@ -18,115 +18,139 @@ const DashboardPage: React.FC = () => {
         // Number of rows to display
         numOfRows: number;
         // First update flag
-        firstUpdate: boolean;
+        static firstUpdate: boolean = true;
         // Constructor
         constructor() {
             // Set the number of rows to display (-1)
-            this.numOfRows = 5;
-            // Set the first update flag
-            this.firstUpdate = true;  
+            this.numOfRows = 5; 
         }
         // Update air temperature table
         async updateAirTemperatureTable(temperature: number, timestamp: string) {
-            // Get AirTemperatureTable and add a new row
-            const airTemperatureTable = document.getElementById("airTemperatureTable")! as  HTMLTableElement;
-            // Create a new row and cells
-            const newRow = airTemperatureTable.insertRow(1);
-            const newCell1 = newRow.insertCell(0);
-            const newCell2 = newRow.insertCell(1);
-            // Set cell style
-            newCell1.style.textAlign = "center";
-            newCell2.style.textAlign = "center";
-            // Add the data to the cell and reformat the timestamp
-            newCell1.innerHTML = temperature.toString() + "°C";
-            timestamp = timestamp.replace("T", " ");
-            timestamp = timestamp.replace("Z", "");
-            newCell2.innerHTML = timestamp;
-            // Remove the last row if there are more than 10 rows
-            if (airTemperatureTable.rows.length > this.numOfRows) {
-                airTemperatureTable.deleteRow(this.numOfRows);
+            try {
+                // Get AirTemperatureTable and add a new row
+                const airTemperatureTable = document.getElementById("airTemperatureTable")! as  HTMLTableElement;
+                // Create a new row and cells
+                const newRow = airTemperatureTable.insertRow(1);
+                const newCell1 = newRow.insertCell(0);
+                const newCell2 = newRow.insertCell(1);
+                // Set cell style
+                newCell1.style.textAlign = "center";
+                newCell2.style.textAlign = "center";
+                // Add the data to the cell and reformat the timestamp
+                newCell1.innerHTML = temperature.toString() + "°C";
+                newCell2.innerHTML = new Date(timestamp).toLocaleString();
+                // Remove the last row if there are more than 10 rows
+                if (airTemperatureTable.rows.length > this.numOfRows) {
+                    airTemperatureTable.deleteRow(this.numOfRows);
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
         // Update air humidity table
         async updateAirHumidityTable(humidity: number, timestamp: string) {
-            // Get AirHumidityTable and add a new row
-            const airHumidityTable = document.getElementById("airHumidityTable")! as HTMLTableElement;
-            // Create a new row and cells
-            const newRow = airHumidityTable.insertRow(1);
-            const newCell1 = newRow.insertCell(0);
-            const newCell2 = newRow.insertCell(1);
-            // Set cell style
-            newCell1.style.textAlign = "center";
-            newCell2.style.textAlign = "center";
-            // Add the data to the cell and reformat the timestamp
-            newCell1.innerHTML = humidity.toString() + "%";
-            timestamp = timestamp.replace("T", " ");
-            timestamp = timestamp.replace("Z", "");
-            newCell2.innerHTML = timestamp;
-            // Remove the last row if there are more than 10 rows
-            if (airHumidityTable.rows.length > this.numOfRows) {
-                airHumidityTable.deleteRow(this.numOfRows);
+            try {
+                // Get AirHumidityTable and add a new row
+                const airHumidityTable = document.getElementById("airHumidityTable")! as HTMLTableElement;
+                // Create a new row and cells
+                const newRow = airHumidityTable.insertRow(1);
+                const newCell1 = newRow.insertCell(0);
+                const newCell2 = newRow.insertCell(1);
+                // Set cell style
+                newCell1.style.textAlign = "center";
+                newCell2.style.textAlign = "center";
+                // Add the data to the cell and reformat the timestamp
+                newCell1.innerHTML = humidity.toString() + "%";
+                newCell2.innerHTML = new Date(timestamp).toLocaleString();
+                // Remove the last row if there are more than 10 rows
+                if (airHumidityTable.rows.length > this.numOfRows) {
+                    airHumidityTable.deleteRow(this.numOfRows);
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
         // Update soil moisture table
         async updateSoilMoistureTable(moisture: number, timestamp: string) {
-            // Get SoilMoistureTable and add a new row
-            const soilMoistureTable = document.getElementById("soilMoistureTable")! as HTMLTableElement;
-            // Create a new row and cells
-            const newRow = soilMoistureTable.insertRow(1);
-            const newCell1 = newRow.insertCell(0);
-            const newCell2 = newRow.insertCell(1);
-            // Set cell style
-            newCell1.style.textAlign = "center";
-            newCell2.style.textAlign = "center";
-            // Add the data to the cell and reformat the timestamp
-            newCell1.innerHTML = moisture.toString() + "%";
-            timestamp = timestamp.replace("T", " ");
-            timestamp = timestamp.replace("Z", "");
-            newCell2.innerHTML = timestamp;
-            // Remove the last row if there are more than 10 rows
-            if (soilMoistureTable.rows.length > this.numOfRows) {
-                soilMoistureTable.deleteRow(this.numOfRows);
+            try {
+                // Get SoilMoistureTable and add a new row
+                const soilMoistureTable = document.getElementById("soilMoistureTable")! as HTMLTableElement;
+                // Create a new row and cells
+                const newRow = soilMoistureTable.insertRow(1);
+                const newCell1 = newRow.insertCell(0);
+                const newCell2 = newRow.insertCell(1);
+                // Set cell style
+                newCell1.style.textAlign = "center";
+                newCell2.style.textAlign = "center";
+                // Add the data to the cell and reformat the timestamp
+                newCell1.innerHTML = moisture.toString() + "%";
+                newCell2.innerHTML = new Date(timestamp).toLocaleString();
+                // Remove the last row if there are more than 10 rows
+                if (soilMoistureTable.rows.length > this.numOfRows) {
+                    soilMoistureTable.deleteRow(this.numOfRows);
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
         // Update relay state table
         async updateRelayStateTable(relayState: boolean, timestamp: string) {
-            // Get RelayStateTable and add a new row
-            const relayStateTable = document.getElementById("relayStateTable")! as HTMLTableElement;
-            // If this is the first update, create a final empty row for spacing
-            if(this.firstUpdate == true) {
-                // Create a final empty row for spacing
-                const finalRow = relayStateTable.insertRow(1);
-                const finalCell1 = finalRow.insertCell(0);
-                const finalCell2 = finalRow.insertCell(1);
-                // Add the empty data to the cell
-                finalCell1.innerHTML = "\r";
-                finalCell2.innerHTML = "\r";
-                // Set the first update flag to false
-                this.firstUpdate = false;
-            }
-            // Create a new row and cells
-            const newRow = relayStateTable.insertRow(1);
-            const newCell1 = newRow.insertCell(0);
-            const newCell2 = newRow.insertCell(1);
-            // Set cell style
-            newCell1.style.textAlign = "center";
-            newCell2.style.textAlign = "center";
-            // Add the data to the celland rephrase the boolean and reformat the timestamp
-            if (relayState) {
-                newCell1.innerHTML = "ON";
-                timestamp = timestamp.replace("T", " ");
-                timestamp = timestamp.replace("Z", "");
-                newCell2.innerHTML = timestamp;
-            } else {
-                newCell1.innerHTML = "OFF";
-                timestamp = timestamp.replace("T", " ");
-                timestamp = timestamp.replace("Z", "");
-                newCell2.innerHTML = timestamp;
-            }
-            // Remove the before last row if there are more than X rows
-            if (relayStateTable.rows.length > (this.numOfRows - 1)) {
-                relayStateTable.deleteRow(this.numOfRows - 1);
+            try {
+                // Get RelayStateTable and add a new row
+                const relayStateTable = document.getElementById("relayStateTable")! as HTMLTableElement;
+                // If this is the first update, create a final empty row for spacing
+                if(updateTables.firstUpdate == true) {
+                    // Create a final empty row for spacing
+                    const finalRow = relayStateTable.insertRow(1);
+                    const finalCell1 = finalRow.insertCell(0);
+                    const finalCell2 = finalRow.insertCell(1);
+                    // Add the empty data to the cell
+                    finalCell1.innerHTML = "...";
+                    finalCell2.innerHTML = "...";
+                    // Set style to match the background
+                    finalCell1.style.textAlign = "center";
+                    finalCell2.style.textAlign = "center";
+                    finalCell1.style.color = "#424242";
+                    finalCell2.style.color = "#424242";
+                    // Set the first update flag to false
+                    updateTables.firstUpdate = false;
+
+                    // Create a new row and cells
+                    const newRow = relayStateTable.insertRow(1);
+                    const newCell1 = newRow.insertCell(0);
+                    const newCell2 = newRow.insertCell(1);
+                    // Set cell style
+                    newCell1.style.textAlign = "center";
+                    newCell2.style.textAlign = "center";
+                    // Add the data to the cell and format the timestamp
+                    newCell2.innerHTML = new Date(timestamp).toLocaleString();
+                    if (relayState) {
+                        newCell1.innerHTML = "ON";
+                    } else {
+                        newCell1.innerHTML = "OFF";
+                    }
+                } else {
+                    // Create a new row and cells
+                    const newRow = relayStateTable.insertRow(1);
+                    const newCell1 = newRow.insertCell(0);
+                    const newCell2 = newRow.insertCell(1);
+                    // Set cell style
+                    newCell1.style.textAlign = "center";
+                    newCell2.style.textAlign = "center";
+                    // Add the data to the cell and format the timestamp
+                    if (relayState) {
+                        newCell1.innerHTML = "ON";
+                    } else {
+                        newCell1.innerHTML = "OFF";
+                    }
+                    newCell2.innerHTML = new Date(timestamp).toLocaleString();
+                    // Insert an empty fifth row if there are more than X rows
+                    if (relayStateTable.rows.length > (this.numOfRows + 1)) {
+                        relayStateTable.deleteRow(relayStateTable.rows.length - 2);
+                    }
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
     } 
@@ -424,10 +448,11 @@ const DashboardPage: React.FC = () => {
             // Create the new chart data
             const newChartData = [...this.state.chartData];
             // Split the timestamp into date and time and format it
-            const [datePart, timePart] = timestamp.split('T');
+            const formatedTimestamp = new Date(timestamp).toLocaleString();
+            const [datePart, timePart] = formatedTimestamp.split(", ");
             // If the chart data array is empty, add the first data point
             if (newChartData.length === 0) {
-                newChartData.push({ soilMoisture: soilMoisture, date: timePart.replace("Z", "") });
+                newChartData.push({ soilMoisture: soilMoisture, date: timePart });
             } else {
                 // Remove the first data point and add the new data point at the end
                 newChartData.shift();
@@ -445,8 +470,9 @@ const DashboardPage: React.FC = () => {
                 const timestampArray = requestArray[1];
                 const chartData = [];
                 for (let i = 0; i < soilMoistureArray.length; i++) {
-                    const [datePart, timePart] = timestampArray[i].split('T');
-                    chartData.push({ soilMoisture: soilMoistureArray[i], date: timePart.replace("Z", "") });
+                    const formatedTimestamp = new Date(timestampArray[i]).toLocaleString();
+                    const [datePart, timePart] = formatedTimestamp.split(", ");
+                    chartData.push({ soilMoisture: soilMoistureArray[i], date: timePart });
                 }
                 // Add the initial 10 data points to the chart data
                 this.setState({ chartData });
@@ -514,14 +540,15 @@ const DashboardPage: React.FC = () => {
             // Create the new chart data
             const newChartData = [...this.state.chartData];
             // Split the timestamp into date and time and format it
-            const [datePart, timePart] = timestamp.split('T');
+            const formatedTimestamp = new Date(timestamp).toLocaleString();
+            const [datePart, timePart] = formatedTimestamp.split(", ");
             // If the chart data array is empty, add the first data point
             if (newChartData.length === 0) {
-                newChartData.push({ airTemperature, airHumidity, date: timePart.replace("Z", "") });
+                newChartData.push({ airTemperature, airHumidity, date: timePart });
             } else {
                 // Remove the oldest data point and add the new one at the end
                 newChartData.shift();
-                newChartData.push({ airTemperature, airHumidity, date: timePart.replace("Z", "") });
+                newChartData.push({ airTemperature, airHumidity, date: timePart });
             }
             // Update the chart data state
             this.setState({ chartData: newChartData });
@@ -535,8 +562,9 @@ const DashboardPage: React.FC = () => {
                 const timestampArray = requestArray[2];
                 const chartData = [];
                 for (let i = 0; i < airTemperatureArray.length; i++) {
-                    const [datePart, timePart] = timestampArray[i].split('T');
-                    chartData.push({ airTemperature: airTemperatureArray[i], airHumidity: airHumidityArray[i], date: timePart.replace("Z", "") });
+                    const formatedTimestamp = new Date(timestampArray[i]).toLocaleString();
+                    const [datePart, timePart] = formatedTimestamp.split(", ");
+                    chartData.push({ airTemperature: airTemperatureArray[i], airHumidity: airHumidityArray[i], date: timePart });
                 }
                 // Add the initial 10 data points to the chart data
                 this.setState({ chartData });
