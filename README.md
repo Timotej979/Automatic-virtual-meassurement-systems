@@ -7,11 +7,11 @@ Both the RPi API and Server are forwarded through nginx reverse proxy for aditio
 ## Getting Started
 
 ### Hardware prerequsites
-- RaspberryPi 3/4 (These were tested and work, should also work for others by editing the .env files in /Raspberry-pi folder)
+- RaspberryPi 3/4 (These were tested and work, should also work for others by editing the .env files in `/Raspberry-pi` folder)
 - Analog soil moisture sensor (Tested with the simple capacitive one that is readily available)
 - DHT22 sensor
 - Relay module to work with RPi
-- Analog-digital-converter MCP3008 for the soil moisture sensor (or any equivalent that is compatible with CircuitPython library)
+- Analog-digital-converter MCP3008 for the soil moisture sensor (or any equivalent that is compatible with *CircuitPython* library)
 - Breakout board (With correct pinout to the sensors and ADC
 
 ### Software prerequisites
@@ -30,7 +30,7 @@ Both the RPi API and Server are forwarded through nginx reverse proxy for aditio
   ```
 2. Set up Tailscale and make sure the Raspberry Pi and Server are connected to the same Tailscale network.
 
-3. Build and run the Docker containers in respective folders (/Raspberry-pi and /Server):
+3. Build and run the Docker containers in respective folders (`/Raspberry-pi` and `/Server`):
   ```bash
     docker compose build 
     docker-compose up
