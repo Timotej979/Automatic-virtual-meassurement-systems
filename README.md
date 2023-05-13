@@ -32,8 +32,8 @@ Both the RPi API and Server are forwarded through nginx reverse proxy for aditio
 
 3. Build and run the Docker containers in respective folders (/Raspberry-pi and /Server):
   ```bash
-  docker compose build 
-  docker-compose up
+    docker compose build 
+    docker-compose up
   ```
 4. Navigate to the frontend website that is proxied through nginx: http://localhost:5001/dashboard
 
