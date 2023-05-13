@@ -15,7 +15,7 @@ Both the RPi API and Server are forwarded through nginx reverse proxy for aditio
 - Breakout board (With correct pinout to the sensors and ADC
 
 ### Software prerequisites
-- Docker and Docker compose ()
+- Docker and Docker compose
 - Tailscale VPN (or any other viable VPN that connects RPI with the server)
 - Optional software for non-containerized development:
   - Next.js 
