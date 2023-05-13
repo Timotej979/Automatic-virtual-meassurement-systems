@@ -17,20 +17,24 @@ Both the RPi API and Server are forwarded through nginx reverse proxy for aditio
 ### Software prerequisites
 - Docker and Docker compose ()
 - Tailscale VPN (or any other viable VPN that connects RPI with the server)
-  - Next.js (Optional fo local development without docker)
-  - PostgreSQL (Optional for managing the databse)
+- Optional software for non-containerized development:
+  - Next.js 
+  - PostgreSQL
+  - Nginx
 
 ### Installing
 1. Clone this repository:
-  bash
-    git clone https://github.com/timotej979/Automatic-virtual-meassurement-systems.git 
+  ```bash
+    git clone https://github.com/Timotej979/Automatic-virtual-meassurement-systems.git 
     cd Automatic-virtual-meassurement-systems
+  ```
+2. Set up Tailscale and make sure the Raspberry Pi and Server are connected to the same Tailscale network.
 
-2. Set up Tailscale and make sure the Raspberry Pi and server are connected to the same Tailscale network.
-
-3. Build and run the Docker containers in respective folders:
-  docker-compose up -d
-
+3. Build and run the Docker containers in respective folders (/Raspberry-pi and /Server):
+  ```bash
+  docker compose build 
+  docker-compose up
+  ```
 4. Navigate to the frontend website that is proxied through nginx: http://localhost:5001/dashboard
 
 ## Usage
