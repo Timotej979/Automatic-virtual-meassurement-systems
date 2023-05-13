@@ -12,7 +12,7 @@ Both the RPi API and Server are forwarded through nginx reverse proxy for aditio
 - DHT22 sensor
 - Relay module to work with RPi
 - Analog-digital-converter MCP3008 for the soil moisture sensor (or any equivalent that is compatible with *CircuitPython* library)
-- Breakout board (With correct pinout to the sensors and ADC
+- Breakout board (With correct pinout to the sensors and ADC)
 
 ### Software prerequisites
 - Docker and Docker compose
