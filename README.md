@@ -1,6 +1,6 @@
 <h1 align="center">Automatic-virtual-meassurement-systems</h1>
 
-<img align="center" src="./Docs/assets/logo.png" alt="typescript" >
+<img align="center" src="./Docs/assets/logo.png" >
 
 
 <p>This is a custom solution for monitoring plant growth using an analog soil moisture sensor, DHT22 air temperature and humidity sensor, and a relay module for controlling the water pump. The system is designed to run on a Raspberry Pi, with a Python asyncio API, and is deployed using Docker. The Raspberry Pi is connected to the server via Tailscale Zero Tier VPN, and on the server side, there is a middleware Golang API that forwards all data to a PostgreSQL database. Additionally, there is a NextJS frontend server written in React and Typescript that serves a real-time website of the sensors that are connected to the Raspberry Pi.</p>
