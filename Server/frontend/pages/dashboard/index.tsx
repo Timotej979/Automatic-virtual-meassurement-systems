@@ -105,8 +105,8 @@ const DashboardPage: React.FC = () => {
                     const finalCell1 = finalRow.insertCell(0);
                     const finalCell2 = finalRow.insertCell(1);
                     // Add the empty data to the cell
-                    finalCell1.innerHTML = "...";
-                    finalCell2.innerHTML = "...";
+                    finalCell1.innerHTML = "&nbsp;";
+                    finalCell2.innerHTML = "&nbsp;";
                     // Set style to match the background
                     finalCell1.style.textAlign = "center";
                     finalCell2.style.textAlign = "center";
