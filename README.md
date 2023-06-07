@@ -20,6 +20,12 @@
   <li>Breakout board (With correct pinout to the sensors and ADC)</li>
 </ul>
 
+<div align="center">
+  <img src="./Docs/assets/circuit1.jpg">
+  <img src="./Docs/assets/circuit2.jpg">
+  <img src="./Docs/assets/circuit3.jpg">
+</div>
+
 <h3>Software prerequisites</h3>
 <ul>
   <li>Docker and Docker compose</li>
@@ -42,7 +48,7 @@
     </pre>
   </li>
   <li>Set up Tailscale and make sure the Raspberry Pi and Server are connected to the same Tailscale network.</li>
-  <li>Build and run the Docker containers in respective folders (`/Raspberry-pi` and `/Server`):
+  <li>Build and run the Docker containers in respective folders (/Raspberry-pi and /Server):
     <pre>
       <code>docker compose build
       docker-compose up</code>
@@ -58,6 +64,8 @@
 <h2>Usage</h2>
 
 <p>Once the system is set up and running, the sensors connected to the Raspberry Pi will begin sending data to the Python asyncio API, which will forward the data to the middleware Golang API on the server. The middleware API will then store the data in the PostgreSQL database. The frontend website will display the real-time data from the sensors, allowing you to monitor the plant growth and control the water pump using the relay module.</p>
+
+<p>More in-detail documentation is available in the PDF report in /Docs folder currently in Slovene language</p>
 
 <h2>Contributing</h2>
 
