@@ -24,7 +24,7 @@
   <img src="./docs/assets/circuit1.jpg" style="width: 70%;">
 </div>
 <div align="center">
-  <img src="./docs/assets/circuit2.jpg" style="width: 52%;">
+  <img src="./docs/assets/circuit2.jpg" style="width: 50%;">
   <img src="./docs/assets/circuit3.jpg" style="width: 48%;">
 </div>
 
