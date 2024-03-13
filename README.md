@@ -25,7 +25,7 @@
 </div>
 <div align="center">
   <img src="./docs/assets/circuit2.jpg" style="width: 51%;">
-  <img src="./docs/assets/circuit3.jpg" style="width: 47%;">
+  <img src="./docs/assets/circuit3.jpg" style="width: 46.5%;">
 </div>
 
 <h3>Software prerequisites</h3>
