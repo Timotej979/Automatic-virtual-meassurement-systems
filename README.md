@@ -45,19 +45,15 @@
 <ol>
   <li>Clone this repository:
     <pre>
-      ```bash
       git clone https://github.com/Timotej979/Automatic-virtual-meassurement-systems.git
       cd Automatic-virtual-meassurement-systems
-      ```
     </pre>
   </li>
   <li>Set up Tailscale and make sure the Raspberry Pi and Server are connected to the same Tailscale network.</li>
   <li>Build and run the Docker containers in respective folders (/Raspberry-pi and /Server):
     <pre>
-      ```bash
       docker compose build
       docker-compose up
-      ```
     </pre>
   </li>
   <li>Navigate to the frontend website that is proxied through nginx: <a href="http://localhost:5001/dashboard">http://localhost:5001/dashboard</a></li>
